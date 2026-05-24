@@ -27,7 +27,7 @@ const TestCard = ({
 
             const now = Date.now();
 
-            const testTime = new Date(liveDateTime).getTime();
+            const testTime = new Date(`${liveDateTime}+05:30`).getTime();
 
             const distance = testTime - now;
 
@@ -194,7 +194,7 @@ const TestCard = ({
                     </p>
 
                     <h3 className="font-bold text-sm">
-                        {new Date(liveDateTime)
+                        {new Date(`${liveDateTime}+05:30`)
                             .toLocaleString("en-IN", {
                                 day: "numeric",
                                 month: "short",
