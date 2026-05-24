@@ -21,7 +21,7 @@ const app = express();
 // }));
 
 app.use(cors({
-    origin:"https://code-rank-tests.vercel.app",
+    origin:process.env.CLIENT_URL,
     credentials:true,
 }));
 
