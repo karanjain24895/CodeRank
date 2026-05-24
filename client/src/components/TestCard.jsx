@@ -30,7 +30,7 @@ const TestCard = ({
 
             // Convert to IST
             const testTime =
-                new Date(liveDateTime).getTime() +
+                new Date(liveDateTime).getTime() -
                 (5.5 * 60 * 60 * 1000);
 
             const distance = testTime - now;
@@ -226,7 +226,7 @@ const TestCard = ({
                         <h3 className="font-bold text-sm">
 
                             {new Date(
-                                new Date(liveDateTime).getTime() +
+                                new Date(liveDateTime).getTime() -
                                 (5.5 * 60 * 60 * 1000)
                             )
                                 .toLocaleString("en-IN", {
