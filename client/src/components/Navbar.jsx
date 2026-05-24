@@ -41,7 +41,7 @@ const Navbar = () => {
 
       setAuthUser(null);
 
-      navigate("/login");
+      navigate("/");
     }
   };
 

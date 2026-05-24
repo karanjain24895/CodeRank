@@ -8,6 +8,7 @@ import {
 import Login from "./pages/authentication/Login";
 import Signup from "./pages/authentication/Signup";
 
+import HomePage from "./pages/home/HomePage";
 import NewTests from "./pages/home/NewTests";
 import AttemptedTests from "./pages/home/AttemptedTests";
 import CodingTest from "./pages/home/CodingTest";
@@ -48,24 +49,7 @@ function App() {
 
               : (
 
-                <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-base-300 via-base-200 to-base-100">
-
-                  <div className="text-center">
-
-                    <h1 className="text-6xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-
-                      CodeRank
-
-                    </h1>
-
-                    <p className="text-xl text-base-content/70 mt-4">
-
-                      Home page coming soon 🚀
-
-                    </p>
-
-                  </div>
-                </div>
+                <HomePage />
               )
           }
         />
