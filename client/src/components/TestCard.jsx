@@ -77,143 +77,139 @@ const TestCard = ({
     }, [liveDateTime]);
 
     return (
-        <div className="w-full bg-base-100 border border-base-300 rounded-3xl p-6 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+    <div className="w-full bg-base-100 border border-base-300 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
 
-            {/* Top Section */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        {/* Top Section */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
 
-                {/* Topic */}
-                <div>
-                    <h2 className="text-3xl font-bold text-base-content">
-                        {topicName}
-                    </h2>
+            {/* Topic */}
+            <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-base-content">
+                    {topicName}
+                </h2>
+            </div>
 
-                    {/* <p className="text-base-content/60 mt-1">
-                        Coding Test
-                    </p> */}
-                </div>
+            {/* Right Side */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
 
-                {/* Right Side */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-
-                    {/* Countdown */}
-                    <div
-                        className={`badge badge-lg px-5 py-4 font-semibold text-sm ${isLive
+                {/* Countdown */}
+                <div
+                    className={`badge px-4 py-3 font-medium text-xs sm:text-sm ${
+                        isLive
                             ? "badge-success"
                             : "badge-secondary"
-                            }`}
-                    >
-                        {isLive
-                            ? "Test is Live 🚀"
-                            : `Starts In ${countdown}`}
-                    </div>
-
-                    {/* Start Test Button */}
-                    <button
-                        onClick={() =>
-                            isLive &&
-                            navigate(`/test/${testId}`)
-                        }
-                        className={`btn rounded-2xl px-6 shadow-lg transition-all duration-300 ${isLive
-                                ? "btn-primary hover:scale-[1.03]"
-                                : "btn-disabled"
-                            }`}
-                    >
-                        {isLive
-                            ? "Start Test"
-                            : "Test Not Live"}
-                    </button>
+                    }`}
+                >
+                    {isLive
+                        ? "Test is Live 🚀"
+                        : `Starts In ${countdown}`}
                 </div>
+
+                {/* Start Test Button */}
+                <button
+                    onClick={() =>
+                        isLive &&
+                        navigate(`/test/${testId}`)
+                    }
+                    className={`btn rounded-xl px-4 h-10 min-h-0 text-sm shadow-sm transition-all duration-300 ${
+                        isLive
+                            ? "btn-primary hover:scale-[1.01]"
+                            : "btn-disabled"
+                    }`}
+                >
+                    {isLive
+                        ? "Start Test"
+                        : "Test Not Live"}
+                </button>
             </div>
-
-            {/* Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-
-                {/* Full Marks */}
-                <div className="bg-base-200 rounded-2xl p-4 flex items-center gap-3">
-
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                        <Trophy size={22} />
-                    </div>
-
-                    <div>
-                        <p className="text-sm text-base-content/60">
-                            Full Marks
-                        </p>
-
-                        <h3 className="font-bold text-lg">
-                            {fullMarks}
-                        </h3>
-                    </div>
-                </div>
-
-                {/* Duration */}
-                <div className="bg-base-200 rounded-2xl p-4 flex items-center gap-3">
-
-                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
-                        <Clock3 size={22} />
-                    </div>
-
-                    <div>
-                        <p className="text-sm text-base-content/60">
-                            Duration
-                        </p>
-
-                        <h3 className="font-bold text-lg">
-                            {duration} Hours
-                        </h3>
-                    </div>
-                </div>
-
-                {/* Questions */}
-                <div className="bg-base-200 rounded-2xl p-4 flex items-center gap-3">
-
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
-                        <BookOpen size={22} />
-                    </div>
-
-                    <div>
-                        <p className="text-sm text-base-content/60">
-                            Questions
-                        </p>
-
-                        <h3 className="font-bold text-lg">
-                            {questionsCount}
-                        </h3>
-                    </div>
-                </div>
-
-                {/* Live Time */}
-                <div className="bg-base-200 rounded-2xl p-4 flex items-center gap-3">
-
-                    <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center text-success">
-                        <CalendarDays size={22} />
-                    </div>
-
-                    <div>
-                        <p className="text-sm text-base-content/60">
-                            Goes Live
-                        </p>
-
-                        <h3 className="font-bold text-lg">
-                            {new Date(liveDateTime)
-                                .toLocaleString("en-IN", {
-                                    day: "numeric",
-                                    month: "short",
-                                    hour: "numeric",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                })
-                                .replace("am", "AM")
-                                .replace("pm", "PM")}
-                        </h3>
-                    </div>
-                </div>
-            </div>
-
-
         </div>
-    );
+
+        {/* Details */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+
+            {/* Full Marks */}
+            <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <Trophy size={18} />
+                </div>
+
+                <div>
+                    <p className="text-xs text-base-content/60">
+                        Full Marks
+                    </p>
+
+                    <h3 className="font-bold text-base">
+                        {fullMarks}
+                    </h3>
+                </div>
+            </div>
+
+            {/* Duration */}
+            <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+
+                <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+                    <Clock3 size={18} />
+                </div>
+
+                <div>
+                    <p className="text-xs text-base-content/60">
+                        Duration
+                    </p>
+
+                    <h3 className="font-bold text-base">
+                        {duration} Hours
+                    </h3>
+                </div>
+            </div>
+
+            {/* Questions */}
+            <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
+                    <BookOpen size={18} />
+                </div>
+
+                <div>
+                    <p className="text-xs text-base-content/60">
+                        Questions
+                    </p>
+
+                    <h3 className="font-bold text-base">
+                        {questionsCount}
+                    </h3>
+                </div>
+            </div>
+
+            {/* Live Time */}
+            <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+
+                <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-success">
+                    <CalendarDays size={18} />
+                </div>
+
+                <div>
+                    <p className="text-xs text-base-content/60">
+                        Goes Live
+                    </p>
+
+                    <h3 className="font-bold text-sm">
+                        {new Date(liveDateTime)
+                            .toLocaleString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true,
+                            })
+                            .replace("am", "AM")
+                            .replace("pm", "PM")}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+);
 };
 
 export default TestCard;

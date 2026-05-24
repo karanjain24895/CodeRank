@@ -46,84 +46,85 @@ const Navbar = () => {
   };
 
   const navLinkClass =
-    ({ isActive }) =>
-      `rounded-2xl px-5 btn border-none transition-all duration-200 ${isActive
+  ({ isActive }) =>
+    `rounded-xl px-3 h-9 min-h-0 text-sm btn border-none transition-all duration-200 ${
+      isActive
         ? "bg-primary text-primary-content"
         : "btn-ghost"
-      }`;
+    }`;
 
-  return (
+return (
 
-    <div className="sticky top-0 z-50 backdrop-blur bg-base-100/80 border-b border-base-300">
+  <div className="sticky top-0 z-50 backdrop-blur bg-base-100/80 border-b border-base-300">
 
-      <div className="w-full px-6 h-20 flex items-center justify-between">
+    <div className="w-full px-4 h-14 flex items-center justify-between">
 
-        {/* Logo */}
-        <Link
-          to={
-            authUser
-              ? "/new-tests"
-              : "/"
-          }
-          className="text-3xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
-        >
-          CodeRank
-        </Link>
+      {/* Logo */}
+      <Link
+        to={
+          authUser
+            ? "/new-tests"
+            : "/"
+        }
+        className="text-2xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+      >
+        CodeRank
+      </Link>
 
-        {/* Right Side */}
-        <div className="flex items-center gap-3">
+      {/* Right Side */}
+      <div className="flex items-center gap-2">
 
-          {!authUser ? (
-            <>
-              {/* Login */}
-              <Link
-                to="/login"
-                className="btn btn-ghost rounded-2xl px-6"
-              >
-                Login
-              </Link>
+        {!authUser ? (
+          <>
+            {/* Login */}
+            <Link
+              to="/login"
+              className="btn btn-ghost rounded-xl px-4 h-9 min-h-0 text-sm"
+            >
+              Login
+            </Link>
 
-              {/* Signup */}
-              <Link
-                to="/signup"
-                className="btn btn-primary rounded-2xl px-6"
-              >
-                Sign Up
-              </Link>
-            </>
-          ) : (
-            <>
-              {/* New Tests */}
-              <NavLink
-                to="/new-tests"
-                className={navLinkClass}
-              >
-                New Tests
-              </NavLink>
+            {/* Signup */}
+            <Link
+              to="/signup"
+              className="btn btn-primary rounded-xl px-4 h-9 min-h-0 text-sm"
+            >
+              Sign Up
+            </Link>
+          </>
+        ) : (
+          <>
+            {/* New Tests */}
+            <NavLink
+              to="/new-tests"
+              className={navLinkClass}
+            >
+              New Tests
+            </NavLink>
 
-              {/* Attempted Tests */}
-              <NavLink
-                to="/attempted-tests"
-                className={navLinkClass}
-              >
-                Attempted Tests
-              </NavLink>
+            {/* Attempted Tests */}
+            <NavLink
+              to="/attempted-tests"
+              className={navLinkClass}
+            >
+              Attempted Tests
+            </NavLink>
 
-              {/* Logout */}
-              <button
-                onClick={handleLogout}
-                className="btn btn-error rounded-2xl px-5"
-              >
-                <LogOut size={18} />
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              className="btn btn-error rounded-xl px-3 h-9 min-h-0 text-sm"
+            >
+              <LogOut size={16} />
 
-                Logout
-              </button>
-            </>
-          )}
-        </div>
+              Logout
+            </button>
+          </>
+        )}
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Navbar;

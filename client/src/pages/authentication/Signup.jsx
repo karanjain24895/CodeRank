@@ -96,200 +96,200 @@ const Signup = () => {
       }
     };
 
-  return (
+return (
 
-    <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 flex items-center justify-center px-6 py-10">
+  <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 flex items-center justify-center px-4 py-6">
 
-      <div className="w-full max-w-md bg-base-100 rounded-[2rem] shadow-2xl border border-base-300 p-10">
+    <div className="w-full max-w-sm bg-base-100 rounded-2xl shadow-xl border border-base-300 p-6">
 
-        {/* Header */}
-        <div className="text-center mb-10">
+      {/* Header */}
+      <div className="text-center mb-6">
 
-          <h1 className="text-5xl font-extrabold leading-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <h1 className="text-3xl font-extrabold leading-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
 
-            Create Account
+          Create Account
 
-          </h1>
+        </h1>
 
-          <p className="text-base-content/70 mt-4 text-lg">
+        <p className="text-base-content/70 mt-2 text-sm">
 
-            Join CodeRank and start solving 🚀
+          Join CodeRank and start solving 🚀
 
-          </p>
-        </div>
-
-        {/* Form */}
-        <form
-          onSubmit={
-            handleSubmit
-          }
-          className="space-y-7"
-        >
-
-          {/* Full Name */}
-          <div className="space-y-3">
-
-            <label className="block text-base font-semibold text-base-content pl-1">
-
-              Full Name
-
-            </label>
-
-            <div className="w-full">
-
-              <label className="input input-bordered w-full rounded-2xl flex items-center gap-4 h-16 px-5">
-
-                <BadgeIcon
-                  size={22}
-                  className="text-base-content/60 shrink-0"
-                />
-
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Enter full name"
-                  className="grow bg-transparent text-base"
-                  value={
-                    formData.name
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  required
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Username */}
-          <div className="space-y-3">
-
-            <label className="block text-base font-semibold text-base-content pl-1">
-
-              Username
-
-            </label>
-
-            <div className="w-full">
-
-              <label className="input input-bordered w-full rounded-2xl flex items-center gap-4 h-16 px-5">
-
-                <User
-                  size={22}
-                  className="text-base-content/60 shrink-0"
-                />
-
-                <input
-                  type="text"
-                  name="username"
-                  placeholder="Enter username"
-                  className="grow bg-transparent text-base"
-                  value={
-                    formData.username
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  required
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Password */}
-          <div className="space-y-3">
-
-            <label className="block text-base font-semibold text-base-content pl-1">
-
-              Password
-
-            </label>
-
-            <div className="w-full">
-
-              <label className="input input-bordered w-full rounded-2xl flex items-center gap-4 h-16 px-5">
-
-                <Lock
-                  size={22}
-                  className="text-base-content/60 shrink-0"
-                />
-
-                <input
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
-                  name="password"
-                  placeholder="Enter password"
-                  className="grow bg-transparent text-base"
-                  value={
-                    formData.password
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  required
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowPassword(
-                      !showPassword
-                    )
-                  }
-                  className="cursor-pointer text-base-content/60 hover:text-base-content transition-colors"
-                >
-
-                  {showPassword ? (
-
-                    <EyeOff
-                      size={22}
-                    />
-
-                  ) : (
-
-                    <Eye
-                      size={22}
-                    />
-                  )}
-                </button>
-              </label>
-            </div>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="btn btn-primary w-full rounded-2xl h-16 text-xl font-bold mt-2"
-            disabled={
-              loading
-            }
-          >
-
-            {loading
-              ? "Creating Account..."
-              : "Sign Up"}
-
-          </button>
-        </form>
-
-        {/* Footer */}
-        <p className="text-center text-base-content/70 mt-10 text-base">
-
-          Already have an account?
-
-          <Link
-            to="/login"
-            className="text-primary font-bold ml-2 hover:underline"
-          >
-            Login
-          </Link>
         </p>
       </div>
+
+      {/* Form */}
+      <form
+        onSubmit={
+          handleSubmit
+        }
+        className="space-y-5"
+      >
+
+        {/* Full Name */}
+        <div className="space-y-2">
+
+          <label className="block text-sm font-semibold text-base-content pl-1">
+
+            Full Name
+
+          </label>
+
+          <div className="w-full">
+
+            <label className="input input-bordered w-full rounded-xl flex items-center gap-3 h-12 px-4">
+
+              <BadgeIcon
+                size={18}
+                className="text-base-content/60 shrink-0"
+              />
+
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter full name"
+                className="grow bg-transparent text-sm"
+                value={
+                  formData.name
+                }
+                onChange={
+                  handleChange
+                }
+                required
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* Username */}
+        <div className="space-y-2">
+
+          <label className="block text-sm font-semibold text-base-content pl-1">
+
+            Username
+
+          </label>
+
+          <div className="w-full">
+
+            <label className="input input-bordered w-full rounded-xl flex items-center gap-3 h-12 px-4">
+
+              <User
+                size={18}
+                className="text-base-content/60 shrink-0"
+              />
+
+              <input
+                type="text"
+                name="username"
+                placeholder="Enter username"
+                className="grow bg-transparent text-sm"
+                value={
+                  formData.username
+                }
+                onChange={
+                  handleChange
+                }
+                required
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* Password */}
+        <div className="space-y-2">
+
+          <label className="block text-sm font-semibold text-base-content pl-1">
+
+            Password
+
+          </label>
+
+          <div className="w-full">
+
+            <label className="input input-bordered w-full rounded-xl flex items-center gap-3 h-12 px-4">
+
+              <Lock
+                size={18}
+                className="text-base-content/60 shrink-0"
+              />
+
+              <input
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                name="password"
+                placeholder="Enter password"
+                className="grow bg-transparent text-sm"
+                value={
+                  formData.password
+                }
+                onChange={
+                  handleChange
+                }
+                required
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
+                className="cursor-pointer text-base-content/60 hover:text-base-content transition-colors"
+              >
+
+                {showPassword ? (
+
+                  <EyeOff
+                    size={18}
+                  />
+
+                ) : (
+
+                  <Eye
+                    size={18}
+                  />
+                )}
+              </button>
+            </label>
+          </div>
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="btn btn-primary w-full rounded-xl h-12 min-h-0 text-base font-bold mt-1"
+          disabled={
+            loading
+          }
+        >
+
+          {loading
+            ? "Creating Account..."
+            : "Sign Up"}
+
+        </button>
+      </form>
+
+      {/* Footer */}
+      <p className="text-center text-base-content/70 mt-6 text-sm">
+
+        Already have an account?
+
+        <Link
+          to="/login"
+          className="text-primary font-bold ml-1 hover:underline"
+        >
+          Login
+        </Link>
+      </p>
     </div>
-  );
+  </div>
+);
 };
 
 export default Signup;

@@ -82,71 +82,71 @@ const NewTests = () => {
 
     if (loading) {
 
-        return (
-
-            <div className="min-h-screen flex items-center justify-center">
-
-                <span className="loading loading-spinner loading-lg"></span>
-
-            </div>
-        );
-    }
-
     return (
 
-        <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-6">
+        <div className="min-h-screen flex items-center justify-center">
 
-            {/* Header */}
-            <div className="mb-10">
+            <span className="loading loading-spinner loading-md"></span>
 
-                <h1 className="text-5xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    New Tests
-                </h1>
-
-                <p className="text-base-content/70 mt-3 text-lg">
-                    Attempt upcoming coding tests 🚀
-                </p>
-            </div>
-
-            {/* Test Cards */}
-            <div className="space-y-6">
-
-                {tests.length > 0 ? (
-
-                    tests.map((test, index) => (
-
-                        <TestCard
-                            key={test._id}
-                            testId={test._id}
-                            testNumber={index + 1}
-                            topicName={test.topicName}
-                            fullMarks={test.fullMarks}
-                            duration={test.duration}
-                            questionsCount={
-                                test.questions.length
-                            }
-                            liveDateTime={
-                                test.startDateTime
-                            }
-                        />
-                    ))
-
-                ) : (
-
-                    <div className="bg-base-100 border border-base-300 rounded-3xl p-10 text-center shadow-md">
-
-                        <h2 className="text-2xl font-bold">
-                            No New Tests
-                        </h2>
-
-                        <p className="text-base-content/60 mt-2">
-                            All available tests are already attempted 🎉
-                        </p>
-                    </div>
-                )}
-            </div>
         </div>
     );
+}
+
+return (
+
+    <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-4 sm:p-5">
+
+        {/* Header */}
+        <div className="mb-6">
+
+            <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                New Tests
+            </h1>
+
+            <p className="text-base-content/70 mt-2 text-sm sm:text-base">
+                Attempt upcoming coding tests 🚀
+            </p>
+        </div>
+
+        {/* Test Cards */}
+        <div className="space-y-4">
+
+            {tests.length > 0 ? (
+
+                tests.map((test, index) => (
+
+                    <TestCard
+                        key={test._id}
+                        testId={test._id}
+                        testNumber={index + 1}
+                        topicName={test.topicName}
+                        fullMarks={test.fullMarks}
+                        duration={test.duration}
+                        questionsCount={
+                            test.questions.length
+                        }
+                        liveDateTime={
+                            test.startDateTime
+                        }
+                    />
+                ))
+
+            ) : (
+
+                <div className="bg-base-100 border border-base-300 rounded-2xl p-6 text-center shadow-sm">
+
+                    <h2 className="text-xl font-bold">
+                        No New Tests
+                    </h2>
+
+                    <p className="text-base-content/60 mt-1 text-sm">
+                        All available tests are already attempted 🎉
+                    </p>
+                </div>
+            )}
+        </div>
+    </div>
+);
 };
 
 export default NewTests;

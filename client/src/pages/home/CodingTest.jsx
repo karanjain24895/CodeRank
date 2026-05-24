@@ -93,160 +93,160 @@ const CodingTest = () => {
 
   if (loading) {
 
-    return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
-        Loading...
-      </div>
-    );
-  }
+  return (
+    <div className="min-h-screen flex items-center justify-center text-lg font-semibold">
+      Loading...
+    </div>
+  );
+}
 
-  if (!test) {
-
-    return (
-      <div className="min-h-screen flex items-center justify-center text-3xl font-bold">
-        Test Not Found
-      </div>
-    );
-  }
+if (!test) {
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-6">
+    <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+      Test Not Found
+    </div>
+  );
+}
 
-      {/* Header */}
-      <div className="mb-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+return (
+  <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-4 sm:p-5">
 
-        {/* Left */}
-        <div>
+    {/* Header */}
+    <div className="mb-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
 
-          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            {test.topicName}
-          </h1>
+      {/* Left */}
+      <div>
 
-          <p className="text-base-content/70 mt-2">
-            Solve all questions carefully within the given time 🚀
-          </p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          {test.topicName}
+        </h1>
 
-          {/* Test Details */}
-          <div className="flex flex-wrap gap-4 mt-6">
+        <p className="text-base-content/70 mt-1 text-sm sm:text-base">
+          Solve all questions carefully within the given time 🚀
+        </p>
 
-            {/* Total Marks */}
-            <div className="bg-base-100 border border-base-300 rounded-2xl px-5 py-4 shadow-md flex items-center gap-3">
+        {/* Test Details */}
+        <div className="flex flex-wrap gap-3 mt-4">
 
-              <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+          {/* Total Marks */}
+          <div className="bg-base-100 border border-base-300 rounded-xl px-4 py-3 shadow-sm flex items-center gap-3">
 
-                <Trophy size={22} />
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
 
-              </div>
+              <Trophy size={18} />
 
-              <div>
+            </div>
 
-                <p className="text-sm text-base-content/60">
-                  Full Marks
-                </p>
+            <div>
 
-                <h3 className="text-lg font-bold text-base-content">
-                  {test.fullMarks}
-                </h3>
-              </div>
+              <p className="text-xs text-base-content/60">
+                Full Marks
+              </p>
+
+              <h3 className="text-base font-bold text-base-content">
+                {test.fullMarks}
+              </h3>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Duration */}
-        <div className="bg-base-100 border border-base-300 rounded-2xl px-5 py-4 shadow-md flex items-center gap-3 h-fit">
+      {/* Duration */}
+      <div className="bg-base-100 border border-base-300 rounded-xl px-4 py-3 shadow-sm flex items-center gap-3 h-fit">
 
-          <div className="w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+        <div className="w-9 h-9 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
 
-            <Clock3 size={22} />
+          <Clock3 size={18} />
 
-          </div>
+        </div>
 
-          <div>
+        <div>
 
-            <p className="text-sm text-base-content/60">
-              Duration
-            </p>
+          <p className="text-xs text-base-content/60">
+            Duration
+          </p>
 
-            <h3 className="text-lg font-bold text-base-content">
-              {test.duration} Hours
-            </h3>
-          </div>
+          <h3 className="text-base font-bold text-base-content">
+            {test.duration} Hours
+          </h3>
         </div>
       </div>
+    </div>
 
-      {/* Instructions */}
-      <div className="bg-base-100 border border-base-300 rounded-2xl p-6 shadow-lg mb-8">
+    {/* Instructions */}
+    <div className="bg-base-100 border border-base-300 rounded-xl p-4 shadow-sm mb-6">
 
-        <h2 className="text-2xl font-bold mb-4 text-base-content">
-          Instructions
-        </h2>
+      <h2 className="text-xl font-bold mb-3 text-base-content">
+        Instructions
+      </h2>
 
-        <ul className="space-y-3">
+      <ul className="space-y-2">
 
-          {test.instructions.map(
-            (
-              instruction,
-              index
-            ) => (
-
-              <li
-                key={index}
-                className="flex items-start gap-3 text-base-content/80"
-              >
-
-                <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
-
-                <span>
-                  {instruction}
-                </span>
-              </li>
-            )
-          )}
-        </ul>
-      </div>
-
-      {/* Questions */}
-      <div className="space-y-5 mb-10">
-
-        {test.questions.map(
+        {test.instructions.map(
           (
-            question,
+            instruction,
             index
           ) => (
 
-            <QuestionCard
+            <li
               key={index}
-              questionNumber={
-                index + 1
-              }
-              title={
-                question.questionName
-              }
-              marks={
-                question.marks
-              }
-              questionLink={
-                question.questionLink
-              }
-            />
+              className="flex items-start gap-2 text-sm text-base-content/80"
+            >
+
+              <div className="w-2 h-2 rounded-full bg-primary mt-1.5"></div>
+
+              <span>
+                {instruction}
+              </span>
+            </li>
           )
         )}
-      </div>
-
-      {/* Submit Button */}
-      <div className="flex justify-end">
-
-        <button
-          onClick={
-            handleSubmit
-          }
-          className="btn btn-primary rounded-2xl px-10 h-14 text-lg"
-        >
-          Submit Test
-        </button>
-      </div>
+      </ul>
     </div>
-  );
+
+    {/* Questions */}
+    <div className="space-y-4 mb-8">
+
+      {test.questions.map(
+        (
+          question,
+          index
+        ) => (
+
+          <QuestionCard
+            key={index}
+            questionNumber={
+              index + 1
+            }
+            title={
+              question.questionName
+            }
+            marks={
+              question.marks
+            }
+            questionLink={
+              question.questionLink
+            }
+          />
+        )
+      )}
+    </div>
+
+    {/* Submit Button */}
+    <div className="flex justify-end">
+
+      <button
+        onClick={
+          handleSubmit
+        }
+        className="btn btn-primary rounded-xl px-6 h-11 min-h-0 text-sm sm:text-base"
+      >
+        Submit Test
+      </button>
+    </div>
+  </div>
+);
 };
 
 export default CodingTest;
