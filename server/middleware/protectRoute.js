@@ -22,7 +22,7 @@ const protectRoute = async (
                 isAdmin: true,
             };
 
-            return next();
+            next();
         }
 
         // NORMAL USER AUTH

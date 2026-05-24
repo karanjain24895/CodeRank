@@ -52,6 +52,70 @@ const TestForm = () => {
       },
     ]);
 
+  // Prevent accidental back / refresh
+  useEffect(() => {
+
+    const handleBeforeUnload = (
+      e
+    ) => {
+
+      e.preventDefault();
+
+      e.returnValue = "";
+    };
+
+    const handlePopState = () => {
+
+      const confirmLeave =
+        window.confirm(
+          "Do you want to go back? Unsaved changes may be lost."
+        );
+
+      if (!confirmLeave) {
+
+        window.history.pushState(
+          null,
+          "",
+          window.location.href
+        );
+      } else {
+
+        navigate(-1);
+      }
+    };
+
+    // Push history state
+    window.history.pushState(
+      null,
+      "",
+      window.location.href
+    );
+
+    window.addEventListener(
+      "beforeunload",
+      handleBeforeUnload
+    );
+
+    window.addEventListener(
+      "popstate",
+      handlePopState
+    );
+
+    return () => {
+
+      window.removeEventListener(
+        "beforeunload",
+        handleBeforeUnload
+      );
+
+      window.removeEventListener(
+        "popstate",
+        handlePopState
+      );
+    };
+
+  }, [navigate]);
+
   // Fetch Existing Test
   useEffect(() => {
 
@@ -67,11 +131,11 @@ const TestForm = () => {
           await axiosInstance.get(
             `/test/${id}`,
             {
-            headers: {
-              "x-admin-key":
-                "mysecretadminkey",
-            },
-          }
+              headers: {
+                "x-admin-key":
+                  "mysecretadminkey",
+              },
+            }
           );
 
         const test = res.data;
@@ -223,57 +287,64 @@ const TestForm = () => {
 
   // Submit
   const handleSubmit = async (
-    e
-  ) => {
+  e
+) => {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
+  try {
 
-      const testData = {
-        topicName,
-        instructions,
-        duration,
-        startDateTime,
-        questions,
-      };
+    const formattedQuestions =
+      questions.map((q) => ({
+        ...q,
+        marks: Number(q.marks),
+      }));
 
-      if (isEdit) {
+    const testData = {
+      topicName,
+      instructions,
+      duration: Number(duration),
+      startDateTime,
+      questions:
+        formattedQuestions,
+    };
 
-        await axiosInstance.put(
-          `/test/${id}`,
-          testData,
-          {
-            headers: {
-              "x-admin-key":
-                "mysecretadminkey",
-            },
-          }
-        );
+    if (isEdit) {
 
-      } else {
-
-        await axiosInstance.post(
-          "/test/create",
-          testData,
-          {
-            headers: {
-              "x-admin-key":
-                "mysecretadminkey",
-            },
-          }
-        );
-      }
-
-      navigate(
-        "/created-tests"
+      await axiosInstance.put(
+        `/test/${id}`,
+        testData,
+        {
+          headers: {
+            "x-admin-key":
+              "mysecretadminkey",
+          },
+        }
       );
 
-    } catch (error) {
+    } else {
 
-      console.log(error);
+      await axiosInstance.post(
+        "/test/create",
+        testData,
+        {
+          headers: {
+            "x-admin-key":
+              "mysecretadminkey",
+          },
+        }
+      );
     }
-  };
+
+    navigate(
+      "/created-tests"
+    );
+
+  } catch (error) {
+
+    console.log(error);
+  }
+};
 
   if (loading) {
 
@@ -288,6 +359,7 @@ const TestForm = () => {
   }
 
   return (
+
     <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-6">
 
       {/* Header */}
@@ -308,6 +380,7 @@ const TestForm = () => {
             : "Create and schedule a coding test 🚀"}
 
         </p>
+
       </div>
 
       {/* Form */}
@@ -349,7 +422,9 @@ const TestForm = () => {
                     )
                   }
                 />
+
               </label>
+
             </div>
 
             {/* Full Marks */}
@@ -369,7 +444,9 @@ const TestForm = () => {
                 />
 
                 {fullMarks}
+
               </div>
+
             </div>
 
             {/* Duration */}
@@ -396,7 +473,9 @@ const TestForm = () => {
                     )
                   }
                 />
+
               </label>
+
             </div>
 
             {/* Start Date Time */}
@@ -424,9 +503,13 @@ const TestForm = () => {
                     )
                   }
                 />
+
               </label>
+
             </div>
+
           </div>
+
         </div>
 
         {/* Instructions */}
@@ -445,9 +528,13 @@ const TestForm = () => {
               }
               className="btn btn-primary rounded-2xl"
             >
+
               <Plus size={20} />
+
               Add
+
             </button>
+
           </div>
 
           <div className="space-y-4">
@@ -463,17 +550,22 @@ const TestForm = () => {
                   className="flex gap-3"
                 >
 
-                  <textarea
-                    className="textarea textarea-bordered rounded-2xl flex-1 min-h-[90px]"
-                    placeholder={`Instruction ${index + 1}`}
-                    value={instruction}
-                    onChange={(e) =>
-                      updateInstruction(
-                        index,
-                        e.target.value
-                      )
-                    }
-                  />
+                  <label className="input input-bordered rounded-2xl flex items-center gap-3 h-14 flex-1">
+
+                    <input
+                      type="text"
+                      className="grow"
+                      placeholder={`Instruction ${index + 1}`}
+                      value={instruction}
+                      onChange={(e) =>
+                        updateInstruction(
+                          index,
+                          e.target.value
+                        )
+                      }
+                    />
+
+                  </label>
 
                   <button
                     type="button"
@@ -486,33 +578,28 @@ const TestForm = () => {
                   >
                     <Trash2 size={18} />
                   </button>
+
                 </div>
               )
             )}
+
           </div>
+
         </div>
 
         {/* Questions */}
         <div className="bg-base-100 border border-base-300 rounded-3xl p-8 shadow-md">
 
-          <div className="flex items-center justify-between mb-8">
+          {/* Heading */}
+          <div className="mb-8 text-center">
 
             <h2 className="text-3xl font-bold">
               Questions
             </h2>
 
-            <button
-              type="button"
-              onClick={
-                addQuestion
-              }
-              className="btn btn-primary rounded-2xl"
-            >
-              <Plus size={20} />
-              Add Question
-            </button>
           </div>
 
+          {/* Questions List */}
           <div className="space-y-6">
 
             {questions.map(
@@ -538,14 +625,15 @@ const TestForm = () => {
                       <div>
 
                         <h3 className="text-2xl font-bold">
-                          Question{" "}
-                          {index + 1}
+                          Question {index + 1}
                         </h3>
 
                         <p className="text-base-content/60">
                           Add question details
                         </p>
+
                       </div>
+
                     </div>
 
                     <button
@@ -559,6 +647,7 @@ const TestForm = () => {
                     >
                       <Trash2 size={18} />
                     </button>
+
                   </div>
 
                   {/* Inputs */}
@@ -584,6 +673,7 @@ const TestForm = () => {
                           )
                         }
                       />
+
                     </label>
 
                     {/* Question Link */}
@@ -606,6 +696,7 @@ const TestForm = () => {
                           )
                         }
                       />
+
                     </label>
 
                     {/* Marks */}
@@ -614,7 +705,7 @@ const TestForm = () => {
                       <Trophy size={20} />
 
                       <input
-                        type="number"
+                        type="text"
                         placeholder="Marks"
                         className="grow"
                         value={
@@ -628,12 +719,34 @@ const TestForm = () => {
                           )
                         }
                       />
+
                     </label>
+
                   </div>
+
                 </div>
               )
             )}
+
           </div>
+
+          {/* Add Question Button */}
+          <div className="flex justify-center mt-8">
+
+            <button
+              type="button"
+              onClick={addQuestion}
+              className="btn btn-primary rounded-2xl px-8 h-14 text-lg"
+            >
+
+              <Plus size={20} />
+
+              Add Question
+
+            </button>
+
+          </div>
+
         </div>
 
         {/* Submit */}
@@ -649,8 +762,11 @@ const TestForm = () => {
               : "Create Test"}
 
           </button>
+
         </div>
+
       </form>
+
     </div>
   );
 };

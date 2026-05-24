@@ -129,32 +129,32 @@ const SubmissionEvaluation = () => {
       try {
 
         await axiosInstance.patch(
-          `/submissions/evaluate/${submissionId}/${index}`,
-          {
-            headers: {
-              "x-admin-key":
-                "mysecretadminkey",
-            },
-          },
-          {
-            codingMarks:
-              question.codingMarks,
+  `/submissions/evaluate/${submissionId}/${index}`,
 
-            timeComplexityMarks:
-              question.timeComplexityMarks,
+  {
+    codingMarks:
+      question.codingMarks,
 
-            spaceComplexityMarks:
-              question.spaceComplexityMarks,
+    timeComplexityMarks:
+      question.timeComplexityMarks,
 
-            remarks:
-              question.remarks,
+    spaceComplexityMarks:
+      question.spaceComplexityMarks,
 
-            isSolved:
-              question.isSolved,
+    remarks:
+      question.remarks,
 
-            // isEvaluated: checked,
-          }
-        );
+    isSolved:
+      question.isSolved,
+  },
+
+  {
+    headers: {
+      "x-admin-key":
+        "mysecretadminkey",
+    },
+  }
+);
 
         alert(
           "Evaluation Updated"
