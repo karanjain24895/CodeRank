@@ -1,0 +1,258 @@
+import React, { useState } from "react";
+
+import {
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
+import axiosInstance from "../../lib/axios";
+
+import useAuthStore from "../../store/useAuthStore";
+
+const Login = () => {
+
+  const navigate =
+    useNavigate();
+
+  const setAuthUser =
+    useAuthStore(
+      (state) =>
+        state.setAuthUser
+    );
+
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
+
+  const [
+    formData,
+    setFormData,
+  ] = useState({
+    username: "",
+    password: "",
+  });
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const handleChange = (
+    e
+  ) => {
+
+    setFormData({
+      ...formData,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
+
+  const handleSubmit =
+    async (e) => {
+
+      e.preventDefault();
+
+      try {
+
+        setLoading(true);
+
+        const response =
+          await axiosInstance.post(
+            "/auth/login",
+            formData
+          );
+
+        const user =
+          response.data;
+
+        setAuthUser(user);
+
+        navigate(
+          "/new-tests"
+        );
+
+      } catch (error) {
+
+        console.log(
+          error.response
+            ?.data
+            ?.message
+        );
+
+      } finally {
+
+        setLoading(false);
+      }
+    };
+
+  return (
+
+    <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 flex items-center justify-center px-6 py-10">
+
+      <div className="w-full max-w-md bg-base-100 rounded-[2rem] shadow-2xl border border-base-300 p-10">
+
+        {/* Header */}
+        <div className="text-center mb-10">
+
+          <h1 className="text-5xl font-extrabold leading-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+
+            Welcome Back
+
+          </h1>
+
+          <p className="text-base-content/70 mt-4 text-lg">
+
+            Login to continue coding 🚀
+
+          </p>
+        </div>
+
+        {/* Form */}
+        <form
+          onSubmit={
+            handleSubmit
+          }
+          className="space-y-7"
+        >
+
+          {/* Username */}
+          <div className="space-y-3">
+
+            <label className="block text-base font-semibold text-base-content">
+
+              Username
+
+            </label>
+
+            <div className="w-full">
+
+              <label className="input input-bordered w-full rounded-2xl flex items-center gap-4 h-16 px-5">
+
+                <User
+                  size={22}
+                  className="text-base-content/60 shrink-0"
+                />
+
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Enter username"
+                  className="grow bg-transparent text-base"
+                  value={
+                    formData.username
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  required
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="space-y-3">
+
+            <label className="block text-base font-semibold text-base-content">
+
+              Password
+
+            </label>
+
+            <div className="w-full">
+
+              <label className="input input-bordered w-full rounded-2xl flex items-center gap-4 h-16 px-5">
+
+                <Lock
+                  size={22}
+                  className="text-base-content/60 shrink-0"
+                />
+
+                <input
+                  type={
+                    showPassword
+                      ? "text"
+                      : "password"
+                  }
+                  name="password"
+                  placeholder="Enter password"
+                  className="grow bg-transparent text-base"
+                  value={
+                    formData.password
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword(
+                      !showPassword
+                    )
+                  }
+                  className="cursor-pointer text-base-content/60 hover:text-base-content transition-colors"
+                >
+
+                  {showPassword ? (
+
+                    <EyeOff
+                      size={22}
+                    />
+
+                  ) : (
+
+                    <Eye
+                      size={22}
+                    />
+                  )}
+                </button>
+              </label>
+            </div>
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            className="btn btn-primary w-full rounded-2xl h-16 text-xl font-bold mt-2"
+            disabled={
+              loading
+            }
+          >
+
+            {loading
+              ? "Logging In..."
+              : "Login"}
+
+          </button>
+        </form>
+
+        {/* Footer */}
+        <p className="text-center text-base-content/70 mt-10 text-base">
+
+          Don’t have an account?
+
+          <Link
+            to="/signup"
+            className="text-primary font-bold ml-2 hover:underline"
+          >
+            Sign Up
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
