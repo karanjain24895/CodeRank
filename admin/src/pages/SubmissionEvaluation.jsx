@@ -44,7 +44,13 @@ const SubmissionEvaluation = () => {
 
           const res =
             await axiosInstance.get(
-              `/submissions/${submissionId}`
+              `/submissions/${submissionId}`,
+              {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
             );
 
           const submission =
@@ -125,6 +131,12 @@ const SubmissionEvaluation = () => {
         await axiosInstance.patch(
           `/submissions/evaluate/${submissionId}/${index}`,
           {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          },
+          {
             codingMarks:
               question.codingMarks,
 
@@ -167,7 +179,13 @@ const SubmissionEvaluation = () => {
         `/submissions/${submissionId}/status`,
         {
           isEvaluated: checked,
-        }
+        },
+        {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
       );
 
     } catch (error) {

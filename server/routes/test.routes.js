@@ -16,35 +16,35 @@ const router = express.Router();
 // Create Test
 router.post(
     "/create",
-    // protectRoute,
+    protectRoute,
     createTest
 );
 
 // Get All Tests
 router.get(
     "/all",
-    // protectRoute,
+    protectRoute,
     getAllTests
 );
 
 // Get Single Test
 router.get(
     "/:id",
-    // protectRoute,
+    protectRoute,
     getSingleTest
 );
 
 // Update Test
 router.put(
     "/:id",
-    // protectRoute,
+    protectRoute,
     updateTest
 );
 
 router.delete(
   "/:testId",
-//   protectRoute,
-//   adminRoute,
+  protectRoute,
+  adminRoute,
   deleteTest
 );
 

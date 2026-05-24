@@ -80,7 +80,13 @@ const CreatedTestCard = ({
               try {
 
                 await axiosInstance.delete(
-                  `/test/${testId}`
+                  `/test/${testId}`,
+                  {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
                 );
 
                 alert(

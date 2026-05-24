@@ -22,7 +22,13 @@ const CreatedTests = () => {
 
       const res =
         await axiosInstance.get(
-          "/test/all"
+          "/test/all",
+          {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
         );
 
       setTests(res.data);

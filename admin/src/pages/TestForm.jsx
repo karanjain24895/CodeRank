@@ -65,7 +65,13 @@ const TestForm = () => {
 
         const res =
           await axiosInstance.get(
-            `/test/${id}`
+            `/test/${id}`,
+            {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
           );
 
         const test = res.data;
@@ -236,14 +242,26 @@ const TestForm = () => {
 
         await axiosInstance.put(
           `/test/${id}`,
-          testData
+          testData,
+          {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
         );
 
       } else {
 
         await axiosInstance.post(
           "/test/create",
-          testData
+          testData,
+          {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
         );
       }
 

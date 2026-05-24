@@ -46,7 +46,13 @@ const Submissions = ({
 
         const response =
           await axiosInstance.get(
-            endpoint
+            endpoint,
+            {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
           );
 
         setSubmissions(
