@@ -9,6 +9,7 @@ getSubmissionById,
 evaluateSubmission,
 getAllSubmissions,
 updateSubmissionStatus,
+getLeaderboardByTest,
 } from "../controllers/submission.controller.js";
 
 
@@ -67,6 +68,11 @@ adminRoute,
 getAllSubmissions
 );
 
+router.get(
+  "/leaderboard/:testId",
+  protectRoute,
+  getLeaderboardByTest
+);
 
 router.get(
     "/:submissionId",

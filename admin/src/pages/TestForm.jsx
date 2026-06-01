@@ -34,8 +34,13 @@ const TestForm = () => {
   const [topicName, setTopicName] =
     useState("");
 
-  const [instructions, setInstructions] =
-    useState([""]);
+const [instructions, setInstructions] =
+  useState([
+    "Using headphones is not allowed",
+    "Write the most optimal code otherwise partial marks will be given",
+    "Marks will be awarded based on marks in Code Studio platform",
+    "Write the Time Complexity and Space Complexity at the end in comments. It contains 6+4 marks respectively",
+  ]);
 
   const [duration, setDuration] =
     useState("");

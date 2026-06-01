@@ -358,3 +358,85 @@ export const getAllSubmissions = async (
         });
     }
 };
+
+
+export const getLeaderboardByTest = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const { testId } =
+      req.params;
+
+    const submissions =
+      await Submission.find({
+        test: testId,
+        isEvaluated: true,
+      })
+        .populate(
+          "user",
+          "name username"
+        )
+        .sort({
+          createdAt: 1,
+        });
+
+    const leaderboard =
+      submissions
+        .map(
+          (
+            submission
+          ) => {
+
+            const score =
+              submission.questions.reduce(
+                (
+                  total,
+                  question
+                ) =>
+                  total +
+                  question.codingMarks +
+                  question.timeComplexityMarks +
+                  question.spaceComplexityMarks,
+                0
+              );
+
+            return {
+              submissionId:
+                submission._id,
+
+              actualName:
+                submission.user.name,
+
+              username:
+                submission.user.username,
+
+              score,
+            };
+          }
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            b.score -
+            a.score
+        );
+
+    res.status(200).json(
+      leaderboard
+    );
+
+  } catch (error) {
+
+    res.status(500).json({
+      message:
+        "Internal server error",
+      error:
+        error.message,
+    });
+  }
+};
