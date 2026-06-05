@@ -17,6 +17,7 @@ app.use(cors({
         process.env.CLIENT_URL,
         process.env.ADMIN_URL
     ],
+    // origin:true,
     credentials: true,
 }));
 

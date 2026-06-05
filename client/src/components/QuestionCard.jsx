@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ExternalLink,
   Trophy,
+  Code2,
+  Database,
+  TerminalSquare,
+  BarChart3,
+  ArrowRight,
+  MessageSquareText, // ✅ FIXED IMPORT
 } from "lucide-react";
 
 const QuestionCard = ({
@@ -10,70 +16,232 @@ const QuestionCard = ({
   marks,
   questionLink,
 }) => {
+  const [solution, setSolution] = useState("");
+  const [timeComplexity, setTimeComplexity] = useState("");
+  const [spaceComplexity, setSpaceComplexity] = useState("");
+
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [isEvaluated, setIsEvaluated] = useState(false);
 
   const handleOpenQuestion = () => {
-    window.open(questionLink, "_blank");
+    if (questionLink) {
+      window.open(questionLink, "_blank");
+    }
   };
 
- return (
-  <div className="w-full bg-base-100 border border-base-300 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+  const handleSubmit = () => {
+    setIsEvaluating(true);
+    setIsEvaluated(false);
 
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    setTimeout(() => {
+      setIsEvaluating(false);
+      setIsEvaluated(true);
+    }, 5000);
+  };
 
-      {/* Left Section */}
-      <div className="flex items-center gap-3">
+  return (
+    <div className="h-full flex flex-col bg-base-100 border border-base-300 rounded-2xl shadow-lg overflow-hidden">
 
-        {/* Question Number */}
-        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold flex items-center justify-center text-sm shrink-0">
-          {questionNumber}
-        </div>
+      {/* HEADER */}
+      <div className="px-6 py-4 border-b border-base-300 bg-base-200/40">
+        <div className="flex items-start justify-between gap-4">
 
-        {/* Question Title */}
-        <div>
-
-          <h2 className="text-base font-semibold text-base-content">
-            {title}
-          </h2>
-
-        </div>
-      </div>
-
-      {/* Right Section */}
-      <div className="flex items-center gap-3">
-
-        {/* Marks */}
-        <div className="flex items-center gap-2 bg-base-200 rounded-xl px-3 py-2">
-
-          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-            <Trophy size={16} />
-          </div>
-
-          <div>
-
-            <p className="text-[11px] text-base-content/60 leading-none mb-1">
-              Marks
+          <div className="min-w-0">
+            <p className="text-xs text-base-content/60">
+              Question {questionNumber}
             </p>
 
-            <h3 className="font-bold text-sm text-base-content">
-              {marks}
-            </h3>
+            <h1 className="text-xl font-bold leading-snug mt-1 truncate">
+              {title}
+            </h1>
           </div>
+
+          <button
+            onClick={handleOpenQuestion}
+            className="btn btn-primary rounded-xl gap-2 whitespace-nowrap"
+          >
+            Solve
+            <ExternalLink size={14} />
+          </button>
+
+        </div>
+      </div>
+
+      {/* STATS BAR */}
+      <div className="px-6 py-3 border-b border-base-300 flex flex-wrap gap-3">
+
+        <div className="flex items-center gap-2 bg-base-200 px-3 py-2 rounded-xl text-sm min-w-[140px]">
+          <Trophy size={16} className="text-primary" />
+          <span className="text-base-content/70">Coding</span>
+          <span className="font-bold ml-auto">{marks - 10}</span>
         </div>
 
-        {/* Solve Button */}
-        <button
-          onClick={handleOpenQuestion}
-          className="btn btn-primary rounded-xl px-4 h-10 min-h-0 text-sm shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-300"
-        >
+        <div className="flex items-center gap-2 bg-base-200 px-3 py-2 rounded-xl text-sm min-w-[140px]">
+          <Code2 size={16} className="text-secondary" />
+          <span className="text-base-content/70">Time</span>
+          <span className="font-bold ml-auto">6</span>
+        </div>
 
-          Solve
+        <div className="flex items-center gap-2 bg-base-200 px-3 py-2 rounded-xl text-sm min-w-[140px]">
+          <Database size={16} className="text-accent" />
+          <span className="text-base-content/70">Space</span>
+          <span className="font-bold ml-auto">4</span>
+        </div>
 
-          <ExternalLink size={16} />
-        </button>
+        <div className="flex items-center gap-2 bg-gradient-to-r from-primary/10 to-secondary/10 px-3 py-2 rounded-xl text-sm min-w-[140px] ml-auto border border-base-300">
+          <BarChart3 size={16} className="text-primary" />
+          <span className="text-base-content/70">Total</span>
+          <span className="font-bold ml-auto">{marks}</span>
+        </div>
+
+      </div>
+
+      {/* BODY */}
+      <div className="flex-1 flex flex-col p-6 gap-4 min-h-0">
+
+        {/* LOADING */}
+        {isEvaluating && (
+          <div className="flex flex-col items-center justify-center flex-1 gap-4">
+            <div className="loading loading-spinner loading-lg text-primary"></div>
+
+            <p className="text-sm text-base-content/70 animate-pulse">
+              AI is evaluating your solution...
+            </p>
+
+            <p className="text-xs text-base-content/50">
+              Checking code quality, time & space complexity
+            </p>
+          </div>
+        )}
+
+        {/* EDITOR VIEW */}
+        {!isEvaluating && !isEvaluated && (
+          <>
+            <div className="flex items-center gap-2 text-sm font-semibold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              <TerminalSquare size={16} className="text-primary" />
+              <span>Your Solution</span>
+            </div>
+
+            <textarea
+              value={solution}
+              onChange={(e) => setSolution(e.target.value)}
+              placeholder="// Paste your solution here..."
+              className="flex-1 w-full resize-none font-mono text-sm p-4 rounded-xl bg-base-200 border border-base-300 outline-none focus:border-primary"
+            />
+
+            <div className="flex items-end gap-3 w-full">
+
+              <div className="flex gap-3 flex-1">
+
+                <div className="flex-1 min-w-[180px]">
+                  <div className="mb-1 text-sm font-semibold text-primary flex items-center gap-1 p-1">
+                    <Code2 size={15} />
+                    <span>Time Complexity</span>
+                  </div>
+
+                  <input
+                    type="text"
+                    value={timeComplexity}
+                    onChange={(e) => setTimeComplexity(e.target.value)}
+                    placeholder="O(n log n)"
+                    className="input input-bordered input-sm w-full"
+                  />
+                </div>
+
+                <div className="flex-1 min-w-[180px]">
+                  <div className="mb-1 text-sm font-semibold text-secondary flex items-center gap-1 p-1">
+                    <Database size={15} />
+                    <span>Space Complexity</span>
+                  </div>
+
+                  <input
+                    type="text"
+                    value={spaceComplexity}
+                    onChange={(e) => setSpaceComplexity(e.target.value)}
+                    placeholder="O(n)"
+                    className="input input-bordered input-sm w-full"
+                  />
+                </div>
+
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                className="btn btn-primary ml-16 px-6 rounded-xl whitespace-nowrap h-[38px] flex items-center gap-2"
+              >
+                Evaluate
+                <ArrowRight size={16} />
+              </button>
+
+            </div>
+          </>
+        )}
+
+        {/* RESULT VIEW */}
+        {isEvaluated && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
+
+              <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  <Code2 size={18} />
+                </div>
+                <div>
+                  <p className="text-xs text-base-content/60">Coding Marks</p>
+                  <h3 className="font-bold text-base">18</h3>
+                </div>
+              </div>
+
+              <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+                  <TerminalSquare size={18} />
+                </div>
+                <div>
+                  <p className="text-xs text-base-content/60">Time Complexity</p>
+                  <h3 className="font-bold text-base">7</h3>
+                </div>
+              </div>
+
+              <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
+                  <Database size={18} />
+                </div>
+                <div>
+                  <p className="text-xs text-base-content/60">Space Complexity</p>
+                  <h3 className="font-bold text-base">8</h3>
+                </div>
+              </div>
+
+              <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-success">
+                  <Trophy size={18} />
+                </div>
+                <div>
+                  <p className="text-xs text-base-content/60">Total Marks</p>
+                  <h3 className="font-bold text-base">33</h3>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="bg-base-200 rounded-xl p-4 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center text-warning shrink-0">
+                <MessageSquareText size={18} />
+              </div>
+
+              <div>
+                <p className="text-xs text-base-content/60 mb-1">Remarks</p>
+                <h3 className="font-medium text-sm text-base-content leading-relaxed">
+                  Good approach, but can be optimized using a more efficient sorting + two pointers strategy.
+                </h3>
+              </div>
+            </div>
+          </>
+        )}
+
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default QuestionCard;

@@ -1,266 +1,181 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 
-import {
-  useParams,
-  useNavigate,
-} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import QuestionCard from "../../components/QuestionCard";
 
-import {
-  Clock3,
-  Trophy,
-} from "lucide-react";
+import { Clock3, Trophy, BookOpen } from "lucide-react";
 
 import axiosInstance from "../../lib/axios";
 
 const CodingTest = () => {
+  const { id: testId } = useParams();
+  const navigate = useNavigate();
 
-  const { id: testId } =
-    useParams();
+  const [loading, setLoading] = useState(true);
+  const [test, setTest] = useState(null);
+  const [selectedQuestion, setSelectedQuestion] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(true);
 
-  const navigate =
-    useNavigate();
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [test, setTest] =
-    useState(null);
-
-  // Fetch Test
   useEffect(() => {
-
-    const fetchTest =
-      async () => {
-
-        try {
-
-          const res =
-            await axiosInstance.get(
-              `/test/${testId}`
-            );
-
-          setTest(
-            res.data
-          );
-
-        } catch (error) {
-
-          console.log(error);
-
-        } finally {
-
-          setLoading(false);
-        }
-      };
-
-    fetchTest();
-
-  }, [testId]);
-
-  // Submit Test
-  const handleSubmit =
-    async () => {
-
+    const fetchTest = async () => {
       try {
-
-        await axiosInstance.post(
-          `/submissions/${testId}`
-        );
-
-        alert(
-          "Test Submitted Successfully"
-        );
-
-        navigate(
-          "/attempted-tests"
-        );
-
+        const res = await axiosInstance.get(`/test/${testId}`);
+        setTest(res.data);
       } catch (error) {
-
         console.log(error);
-
-        alert(
-          error.response?.data
-            ?.message ||
-            "Submission Failed"
-        );
+      } finally {
+        setLoading(false);
       }
     };
 
-  if (loading) {
+    fetchTest();
+  }, [testId]);
 
+  const handleSubmit = async () => {
+    try {
+      await axiosInstance.post(`/submissions/${testId}`);
+
+      alert("Test Submitted Successfully");
+      navigate("/attempted-tests");
+    } catch (error) {
+      console.log(error);
+      alert(error.response?.data?.message || "Submission Failed");
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-lg font-semibold">
+      <div className="h-[calc(100dvh-3.5rem)] flex items-center justify-center text-lg font-semibold">
         Loading...
       </div>
     );
   }
 
   if (!test) {
-
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+      <div className="h-[calc(100dvh-3.5rem)] flex items-center justify-center text-2xl font-bold">
         Test Not Found
       </div>
     );
   }
 
   return (
-
-    <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-4 sm:p-5">
-
-      {/* Header */}
-      <div className="mb-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-
-        {/* Left */}
-        <div>
-
-          <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-
-            {test.topicName}
-
-          </h1>
-
-          <p className="text-base-content/70 mt-1 text-sm sm:text-base">
-
-            Solve all questions carefully within the given time 🚀
-
-          </p>
-        </div>
-
-        {/* Right Side Cards */}
-        <div className="flex flex-wrap gap-3">
-
-          {/* Full Marks */}
-          <div className="bg-base-100 border border-base-300 rounded-xl px-4 py-3 shadow-sm flex items-center gap-3 h-fit">
-
-            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-
-              <Trophy size={18} />
-
-            </div>
-
-            <div>
-
-              <p className="text-xs text-base-content/60">
-                Full Marks
+    <>
+      {showInstructions && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-base-100 rounded-3xl shadow-2xl border border-base-300 w-full max-w-3xl overflow-hidden">
+            <div className="bg-gradient-to-r from-primary to-secondary p-6 text-primary-content">
+              <h2 className="text-3xl font-extrabold">{test.topicName}</h2>
+              <p className="mt-2 opacity-90">
+                Read all instructions carefully before starting.
               </p>
-
-              <h3 className="text-base font-bold text-base-content">
-                {test.fullMarks}
-              </h3>
-
-            </div>
-          </div>
-
-          {/* Duration */}
-          <div className="bg-base-100 border border-base-300 rounded-xl px-4 py-3 shadow-sm flex items-center gap-3 h-fit">
-
-            <div className="w-9 h-9 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
-
-              <Clock3 size={18} />
-
             </div>
 
-            <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+              <div className="bg-base-200 rounded-2xl p-5 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Trophy size={22} />
+                </div>
+                <div>
+                  <p className="text-sm text-base-content/60">Full Marks</p>
+                  <h3 className="text-2xl font-bold">{test.fullMarks}</h3>
+                </div>
+              </div>
 
-              <p className="text-xs text-base-content/60">
-                Duration
-              </p>
-
-              <h3 className="text-base font-bold text-base-content">
-                {test.duration} Hours
-              </h3>
-
+              <div className="bg-base-200 rounded-2xl p-5 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+                  <Clock3 size={22} />
+                </div>
+                <div>
+                  <p className="text-sm text-base-content/60">Duration</p>
+                  <h3 className="text-2xl font-bold">{test.duration} Hours</h3>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Instructions */}
-      <div className="bg-base-100 border border-base-300 rounded-xl p-4 shadow-sm mb-6">
+            <div className="px-6 pb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen size={20} />
+                <h3 className="text-xl font-bold">Instructions</h3>
+              </div>
 
-        <h2 className="text-xl font-bold mb-3 text-base-content">
-          Instructions
-        </h2>
+              <div className="bg-base-200 rounded-2xl p-4 max-h-72 overflow-y-auto">
+                <ul className="space-y-3">
+                  {test.instructions.map((instruction, index) => (
+                    <li key={index} className="flex gap-3 text-sm">
+                      <div className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0" />
+                      <span>{instruction}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-        <ul className="space-y-2">
-
-          {test.instructions.map(
-            (
-              instruction,
-              index
-            ) => (
-
-              <li
-                key={index}
-                className="flex items-start gap-2 text-sm text-base-content/80"
+              <button
+                onClick={() => setShowInstructions(false)}
+                className="btn btn-primary w-full mt-6 h-12 rounded-xl text-base"
               >
+                I Understand, Start Test
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-                <div className="w-2 h-2 rounded-full bg-primary mt-1.5"></div>
+      <div className="h-[calc(100dvh-3.5rem)] overflow-hidden bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-4">
+        <div className="h-full min-h-0 flex flex-col">
+          <div className="shrink-0 mb-4">
+            <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              {test.topicName}
+            </h1>
+            <p className="text-base-content/70 mt-1">
+              Solve all questions carefully 🚀
+            </p>
+          </div>
 
-                <span>
-                  {instruction}
-                </span>
+          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-3 h-full min-h-0">
+              <div className="bg-base-100 border border-base-300 rounded-2xl shadow-sm h-full min-h-0 flex flex-col overflow-hidden">
+                <div className="p-4 border-b border-base-300 shrink-0">
+                  <h3 className="font-bold">Questions</h3>
+                </div>
 
-              </li>
-            )
-          )}
-        </ul>
+                <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-2">
+                  {test.questions.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedQuestion(index)}
+                      className={`w-full text-left px-4 py-3 rounded-xl transition-all ${
+                        selectedQuestion === index
+                          ? "bg-primary text-primary-content"
+                          : "bg-base-200 hover:bg-base-300"
+                      }`}
+                    >
+                      Question {index + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="p-4 border-t border-base-300 shrink-0">
+                  <button onClick={handleSubmit} className="btn btn-primary w-full">
+                    Submit Test
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-9 h-full min-h-0 overflow-hidden">
+              <QuestionCard
+                questionNumber={selectedQuestion + 1}
+                title={test.questions[selectedQuestion].questionName}
+                marks={test.questions[selectedQuestion].marks}
+                questionLink={test.questions[selectedQuestion].questionLink}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Questions */}
-      <div className="space-y-4 mb-8">
-
-        {test.questions.map(
-          (
-            question,
-            index
-          ) => (
-
-            <QuestionCard
-              key={index}
-              questionNumber={
-                index + 1
-              }
-
-              title={
-                question.questionName
-              }
-
-              marks={
-                question.marks
-              }
-
-              questionLink={
-                question.questionLink
-              }
-            />
-          )
-        )}
-      </div>
-
-      {/* Submit Button */}
-      <div className="flex justify-end">
-
-        <button
-          onClick={
-            handleSubmit
-          }
-
-          className="btn btn-primary rounded-xl px-6 h-11 min-h-0 text-sm sm:text-base"
-        >
-
-          Submit Test
-
-        </button>
-      </div>
-    </div>
+    </>
   );
 };
 
