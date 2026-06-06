@@ -28,14 +28,16 @@ const AttemptedTestCard = ({
   submissionId,
 
   status,
+  
+  finished,
 
 }) => {
 
   const navigate =
     useNavigate();
 
-  const isEvaluated =
-    status === "evaluated";
+  const isEvaluated = finished==true;
+    // status === "evaluated";
 
   // Safe Percentage
   const percentage =

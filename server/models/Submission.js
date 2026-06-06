@@ -14,28 +14,56 @@ const submissionSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Submission Status
+    // =========================
+    // TEST STATUS
+    // =========================
     status: {
       type: String,
-      enum: [
-        "pending",
-        "evaluated",
-      ],
+      enum: ["pending", "evaluated"],
       default: "pending",
     },
 
-    // Whether admin finalized evaluation
     isEvaluated: {
       type: Boolean,
       default: false,
     },
 
-    // Evaluation completion timestamp
+    isFinished: {
+      type: Boolean,
+      default: false,
+    },
+
+    submittedAt: {
+      type: Date,
+      default: null,
+    },
+
     evaluatedAt: {
       type: Date,
       default: null,
     },
 
+    // =========================
+    // TIMED TEST SUPPORT
+    // =========================
+    startTime: {
+      type: Date,
+      default: null,
+    },
+
+    endTime: {
+      type: Date,
+      default: null,
+    },
+
+    duration: {
+      type: Number, // in hours (copied from Test for reference)
+      default: null,
+    },
+
+    // =========================
+    // QUESTIONS
+    // =========================
     questions: [
       {
         questionName: {
@@ -46,6 +74,18 @@ const submissionSchema = new mongoose.Schema(
         questionLink: {
           type: String,
           required: true,
+        },
+
+        submittedTimeComplexity: {
+          type: String,
+          default: "",
+          trim: true,
+        },
+
+        submittedSpaceComplexity: {
+          type: String,
+          default: "",
+          trim: true,
         },
 
         codingMarks: {
@@ -66,8 +106,12 @@ const submissionSchema = new mongoose.Schema(
           min: 0,
         },
 
-        // Whether this question is solved
         isSolved: {
+          type: Boolean,
+          default: false,
+        },
+
+        isEvaluated: {
           type: Boolean,
           default: false,
         },

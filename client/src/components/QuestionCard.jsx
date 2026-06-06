@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../lib/axios";
+import ConfirmBox from "./ConfirmBox";
+
+
 import {
   ExternalLink,
   Trophy,
@@ -11,33 +15,106 @@ import {
 } from "lucide-react";
 
 const QuestionCard = ({
+  testId,
+  questionIndex,
+  submissionId,
+  setSubmissionId,
+
   questionNumber,
   title,
   marks,
   questionLink,
+
+  timeComplexity,
+  spaceComplexity,
+
+  onTimeComplexityChange,
+  onSpaceComplexityChange,
+
+  isEvaluated,
+  codingMarks,
+  timeComplexityMarks,
+  spaceComplexityMarks,
+  remarks,
+
+  onEvaluationComplete,
 }) => {
   const [solution, setSolution] = useState("");
-  const [timeComplexity, setTimeComplexity] = useState("");
-  const [spaceComplexity, setSpaceComplexity] = useState("");
+  // const [timeComplexity, setTimeComplexity] = useState("");
+  // const [spaceComplexity, setSpaceComplexity] = useState("");
 
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [isEvaluated, setIsEvaluated] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  // const [isEvaluated, setIsEvaluated] = useState(false);
 
-  const handleOpenQuestion = () => {
-    if (questionLink) {
-      window.open(questionLink, "_blank");
-    }
-  };
+  useEffect(() => {
+    setSolution("");
+  }, [questionIndex]);
 
-  const handleSubmit = () => {
+const handleOpenQuestion = () => {
+  if (!questionLink) return;
+
+  const url =
+    questionLink.startsWith("http")
+      ? questionLink
+      : `https://${questionLink}`;
+
+  window.open(url, "_blank", "noopener,noreferrer");
+};
+
+ const handleSubmit = async () => {
+  if (!solution.trim()) {
+    return alert("Please enter your solution");
+  }
+
+  if (!timeComplexity.trim()) {
+    return alert(
+      "Please enter Time Complexity"
+    );
+  }
+
+  if (!spaceComplexity.trim()) {
+    return alert(
+      "Please enter Space Complexity"
+    );
+  }
+  try {
     setIsEvaluating(true);
-    setIsEvaluated(false);
 
-    setTimeout(() => {
-      setIsEvaluating(false);
-      setIsEvaluated(true);
-    }, 5000);
-  };
+    const res =
+      await axiosInstance.post(
+  `/submissions/evaluate-question/${submissionId}/${testId}/${questionIndex}`,
+  {
+    solution,
+    timeComplexity,
+    spaceComplexity,
+    marks,
+  }
+);
+
+    const evaluatedQuestion =
+      res.data.question;
+
+onEvaluationComplete(
+  questionIndex,
+  evaluatedQuestion
+);
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Evaluation failed"
+    );
+
+  } finally {
+
+    setIsEvaluating(false);
+
+  }
+};
 
   return (
     <div className="h-full flex flex-col bg-base-100 border border-base-300 rounded-2xl shadow-lg overflow-hidden">
@@ -142,7 +219,9 @@ const QuestionCard = ({
                   <input
                     type="text"
                     value={timeComplexity}
-                    onChange={(e) => setTimeComplexity(e.target.value)}
+                    onChange={(e) =>
+                      onTimeComplexityChange(e.target.value)
+                    }
                     placeholder="O(n log n)"
                     className="input input-bordered input-sm w-full"
                   />
@@ -157,7 +236,9 @@ const QuestionCard = ({
                   <input
                     type="text"
                     value={spaceComplexity}
-                    onChange={(e) => setSpaceComplexity(e.target.value)}
+                    onChange={(e) =>
+                      onSpaceComplexityChange(e.target.value)
+                    }
                     placeholder="O(n)"
                     className="input input-bordered input-sm w-full"
                   />
@@ -166,12 +247,12 @@ const QuestionCard = ({
               </div>
 
               <button
-                onClick={handleSubmit}
-                className="btn btn-primary ml-16 px-6 rounded-xl whitespace-nowrap h-[38px] flex items-center gap-2"
-              >
-                Evaluate
-                <ArrowRight size={16} />
-              </button>
+  onClick={() => setShowConfirm(true)}
+  className="btn btn-primary ml-16 px-6 rounded-xl whitespace-nowrap h-[38px] flex items-center gap-2"
+>
+  Evaluate
+  <ArrowRight size={16} />
+</button>
 
             </div>
           </>
@@ -188,7 +269,9 @@ const QuestionCard = ({
                 </div>
                 <div>
                   <p className="text-xs text-base-content/60">Coding Marks</p>
-                  <h3 className="font-bold text-base">18</h3>
+                  <h3 className="font-bold text-base">
+                    {codingMarks}
+                  </h3>
                 </div>
               </div>
 
@@ -198,7 +281,9 @@ const QuestionCard = ({
                 </div>
                 <div>
                   <p className="text-xs text-base-content/60">Time Complexity</p>
-                  <h3 className="font-bold text-base">7</h3>
+                  <h3 className="font-bold text-base">
+                    {timeComplexityMarks}
+                  </h3>
                 </div>
               </div>
 
@@ -208,7 +293,9 @@ const QuestionCard = ({
                 </div>
                 <div>
                   <p className="text-xs text-base-content/60">Space Complexity</p>
-                  <h3 className="font-bold text-base">8</h3>
+                  <h3 className="font-bold text-base">
+                    {spaceComplexityMarks}
+                  </h3>
                 </div>
               </div>
 
@@ -218,7 +305,11 @@ const QuestionCard = ({
                 </div>
                 <div>
                   <p className="text-xs text-base-content/60">Total Marks</p>
-                  <h3 className="font-bold text-base">33</h3>
+                  <h3 className="font-bold text-base">
+                    {codingMarks +
+                      timeComplexityMarks +
+                      spaceComplexityMarks}
+                  </h3>
                 </div>
               </div>
 
@@ -232,7 +323,7 @@ const QuestionCard = ({
               <div>
                 <p className="text-xs text-base-content/60 mb-1">Remarks</p>
                 <h3 className="font-medium text-sm text-base-content leading-relaxed">
-                  Good approach, but can be optimized using a more efficient sorting + two pointers strategy.
+                  {remarks}
                 </h3>
               </div>
             </div>
@@ -240,6 +331,18 @@ const QuestionCard = ({
         )}
 
       </div>
+      <ConfirmBox
+  isOpen={showConfirm}
+  title="Confirm Evaluation"
+  message="Are you sure you want to Evaluate?"
+  confirmText="Yes, Evaluate"
+  cancelText="Cancel"
+  onCancel={() => setShowConfirm(false)}
+  onConfirm={() => {
+    setShowConfirm(false);
+    handleSubmit();
+  }}
+/>
     </div>
   );
 };

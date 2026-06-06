@@ -1,53 +1,109 @@
 import Submission from "../models/Submission.js";
 import Test from "../models/Test.js";
+import { reviewCode } from "../services/aiReview.service.js";
 
 // Create Submission
-export const createSubmission = async (
-    req,
-    res
-) => {
+export const createSubmission = async (req, res) => {
+  try {
+    const { testId } = req.body;
 
-    try {
+    // =========================
+    // Fetch Test
+    // =========================
+    const test = await Test.findById(testId);
 
-        const {
-            testId,
-        } = req.body;
-
-        // Prevent duplicate submissions
-        const existingSubmission =
-            await Submission.findOne({
-                user: req.user._id,
-                test: testId,
-            });
-
-        if (existingSubmission) {
-
-            return res.status(400).json({
-                message:
-                    "Submission already exists",
-            });
-        }
-
-        const submission =
-            await Submission.create({
-                user: req.user._id,
-                test: testId,
-                status: "pending",
-                questions: [],
-            });
-
-        res.status(201).json(
-            submission
-        );
-
-    } catch (error) {
-
-        res.status(500).json({
-            message:
-                "Internal server error",
-            error: error.message,
-        });
+    if (!test) {
+      return res.status(404).json({
+        message: "Test not found",
+      });
     }
+
+    const now = new Date();
+
+    // =========================
+    // (OPTIONAL) time validation
+    // keeps system consistent
+    // =========================
+    if (test.startDateTime && now < new Date(test.startDateTime)) {
+      return res.status(403).json({
+        message: "Test has not started yet",
+      });
+    }
+
+    if (test.endDateTime && now > new Date(test.endDateTime)) {
+      return res.status(403).json({
+        message: "Test has already ended",
+      });
+    }
+
+    // =========================
+    // Prevent duplicate submission
+    // =========================
+    const existingSubmission = await Submission.findOne({
+      user: req.user._id,
+      test: testId,
+    });
+
+    if (existingSubmission) {
+      return res.status(400).json({
+        message: "Submission already exists",
+      });
+    }
+
+    // =========================
+    // Build questions (UNCHANGED)
+    // =========================
+    const questions = test.questions.map((q) => ({
+      questionName: q.questionName,
+      questionLink: q.questionLink,
+
+      submittedTimeComplexity: "",
+      submittedSpaceComplexity: "",
+
+      codingMarks: 0,
+      timeComplexityMarks: 0,
+      spaceComplexityMarks: 0,
+
+      isSolved: false,
+      isEvaluated: false,
+
+      remarks: "",
+    }));
+
+    // =========================
+    // TIMER LOGIC (NEW ADDITION)
+    // =========================
+    const startTime = new Date();
+
+    const endTime = new Date(
+      startTime.getTime() + test.duration * 60 * 60 * 1000
+    );
+
+    // =========================
+    // CREATE SUBMISSION (UNCHANGED + EXTENDED)
+    // =========================
+    const submission = await Submission.create({
+      user: req.user._id,
+      test: testId,
+      status: "pending",
+      questions,
+
+      // NEW FIELDS (ADDED SAFELY)
+      startTime,
+      endTime,
+      duration: test.duration,
+
+      isFinished: false,
+      submittedAt: null,
+    });
+
+    return res.status(201).json(submission);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
 };
 
 // Submit Test
@@ -84,15 +140,30 @@ export const submitTest =
             }
 
             // Copy Questions
-            const questions = test.questions.map((question) => ({
-                questionName: question.questionName,
-                questionLink: question.questionLink,
-                codingMarks: 0,
-                timeComplexityMarks: 0,
-                spaceComplexityMarks: 0,
-                isSolved: false,
-                remarks: "",
-            }));
+const questions = test.questions.map(
+  (question, index) => ({
+    questionName: question.questionName,
+    questionLink: question.questionLink,
+
+    submittedTimeComplexity:
+      req.body.questions?.[index]
+        ?.timeComplexity || "",
+
+    submittedSpaceComplexity:
+      req.body.questions?.[index]
+        ?.spaceComplexity || "",
+
+    isEvaluated:
+      req.body.questions?.[index]
+        ?.isEvaluated || false,
+
+    codingMarks: 0,
+    timeComplexityMarks: 0,
+    spaceComplexityMarks: 0,
+    isSolved: false,
+    remarks: "",
+  })
+);
             // Create Submission
             const submission =
                 await Submission.create({
@@ -255,6 +326,8 @@ export const updateSubmissionStatus =
         isEvaluated
           ? new Date()
           : null;
+
+          
 
       await submission.save();
 
@@ -432,6 +505,248 @@ export const getLeaderboardByTest = async (
 
   } catch (error) {
 
+    res.status(500).json({
+      message:
+        "Internal server error",
+      error:
+        error.message,
+    });
+  }
+};
+
+
+
+
+export const evaluateQuestion = async (
+  req,
+  res
+) => {
+  try {
+    const {
+      testId,
+      questionIndex,
+    } = req.params;
+
+    const {
+      solution,
+      timeComplexity,
+      spaceComplexity,
+      marks,
+    } = req.body;
+
+    if (!solution?.trim()) {
+      return res.status(400).json({
+        message: "Solution is required",
+      });
+    }
+
+    const test =
+      await Test.findById(testId);
+
+    if (!test) {
+      return res.status(404).json({
+        message: "Test not found",
+      });
+    }
+
+    let submission =
+      await Submission.findOne({
+        user: req.user._id,
+        test: testId,
+      });
+
+    // Create submission if not exists
+    if (!submission) {
+      submission =
+        await Submission.create({
+          user: req.user._id,
+          test: testId,
+          status: "pending",
+          questions:
+            test.questions.map((q) => ({
+              questionName:
+                q.questionName,
+
+              questionLink:
+                q.questionLink,
+
+              submittedTimeComplexity:
+                "",
+
+              submittedSpaceComplexity:
+                "",
+
+              codingMarks: 0,
+
+              timeComplexityMarks: 0,
+
+              spaceComplexityMarks: 0,
+
+              isSolved: false,
+
+              isEvaluated: false,
+
+              remarks: "",
+            })),
+        });
+    }
+
+    const question =
+      submission.questions[
+        Number(questionIndex)
+      ];
+
+    if (!question) {
+      return res.status(404).json({
+        message:
+          "Question not found",
+      });
+    }
+
+    // Prevent re-evaluation
+    if (question.isEvaluated) {
+      return res.status(400).json({
+        message:
+          "Question already evaluated",
+      });
+    }
+
+    // Save TC / SC entered by user
+    question.submittedTimeComplexity =
+      timeComplexity || "";
+
+    question.submittedSpaceComplexity =
+      spaceComplexity || "";
+
+    // =========================
+    // AI EVALUATION
+    // =========================
+
+    const aiResult =
+      await reviewCode(
+        solution,
+        question.questionLink,
+        timeComplexity,
+        spaceComplexity,
+        marks
+      );
+
+    question.codingMarks =
+      parseInt(
+        aiResult.codingMarks
+      ) || 0;
+
+    question.timeComplexityMarks =
+      parseInt(
+        aiResult.timeComplexityMarks
+      ) || 0;
+
+    question.spaceComplexityMarks =
+      parseInt(
+        aiResult.spaceComplexityMarks
+      ) || 0;
+
+    question.remarks =
+      aiResult.remarks || "";
+
+    question.isSolved =
+      question.codingMarks > 0;
+
+    question.isEvaluated =
+      true;
+
+    await submission.save();
+
+    return res.status(200).json({
+      message:
+        "Question evaluated successfully",
+
+      question,
+
+      submission,
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Evaluate Question Error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Internal server error",
+
+      error:
+        error.message,
+    });
+  }
+};
+
+export const finishSubmission =
+  async (req, res) => {
+    try {
+      const { submissionId } =
+        req.params;
+
+      const submission =
+        await Submission.findById(
+          submissionId
+        );
+
+      if (!submission) {
+        return res.status(404).json({
+          message:
+            "Submission not found",
+        });
+      }
+
+      submission.isFinished =
+        true;
+
+      
+
+      submission.submittedAt =
+        new Date();
+
+      await submission.save();
+
+      res.status(200).json({
+        message:
+          "Test submitted successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        message:
+          "Internal server error",
+        error:
+          error.message,
+      });
+    }
+  };
+
+  export const getSubmissionByTest = async (
+  req,
+  res
+) => {
+  try {
+    const submission =
+      await Submission.findOne({
+        user: req.user._id,
+        test: req.params.testId,
+      });
+
+    if (!submission) {
+      return res.status(404).json({
+        message:
+          "Submission not found",
+      });
+    }
+
+    res.status(200).json(
+      submission
+    );
+  } catch (error) {
     res.status(500).json({
       message:
         "Internal server error",

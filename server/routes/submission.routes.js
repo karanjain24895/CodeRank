@@ -1,90 +1,136 @@
 import express from "express";
 
 import {
-submitTest,
-createSubmission,
-getUserSubmissions,
-getPendingSubmissions,
-getSubmissionById,
-evaluateSubmission,
-getAllSubmissions,
-updateSubmissionStatus,
-getLeaderboardByTest,
+  submitTest,
+  createSubmission,
+  getUserSubmissions,
+  getPendingSubmissions,
+  getSubmissionById,
+  evaluateSubmission,
+  getAllSubmissions,
+  updateSubmissionStatus,
+  getLeaderboardByTest,
+  evaluateQuestion,
+  finishSubmission,
+  getSubmissionByTest,
 } from "../controllers/submission.controller.js";
-
 
 import protectRoute from "../middleware/protectRoute.js";
 import adminRoute from "../middleware/adminRoute.js";
+// import { checkTestTime } from "../middleware/checkTestTime.js";
 
 const router = express.Router();
 
+// =========================
 // Create Submission
+// =========================
 router.post(
-    "/create",
-    protectRoute,
-    createSubmission
+  "/create",
+  protectRoute,
+  createSubmission
 );
 
-// Submit Test
+// =========================
+// Submit Test (SAFEGUARD ADDED)
+// =========================
 router.post(
-    "/:testId",
-    protectRoute,
-    submitTest
+  "/:testId",
+  protectRoute,
+  // checkTestTime,
+  submitTest
 );
 
-// Get Logged In User Submissions
+// =========================
+// Get User Submissions
+// =========================
 router.get(
-    "/me",
-    protectRoute,
-    getUserSubmissions
+  "/me",
+  protectRoute,
+  getUserSubmissions
 );
 
-// Get Pending Submissions (Admin)
+// =========================
+// Pending (Admin)
+// =========================
 router.get(
-    "/pending",
-    protectRoute,
-    adminRoute,
-    getPendingSubmissions
+  "/pending",
+  protectRoute,
+  adminRoute,
+  getPendingSubmissions
 );
 
-// router.get(
-//     "/:id",
-//     protectRoute,
-//     getSubmissionById
-// );
-
+// =========================
+// Evaluate Submission (Admin)
+// =========================
 router.patch(
-    "/evaluate/:submissionId/:questionIndex",
-    protectRoute,
-    adminRoute,
-    evaluateSubmission
+  "/evaluate/:submissionId/:questionIndex",
+  protectRoute,
+  adminRoute,
+  evaluateSubmission
 );
 
-// Admin Submission History
+// =========================
+// Admin History
+// =========================
 router.get(
-"/all",
-protectRoute,
-adminRoute,
-getAllSubmissions
+  "/all",
+  protectRoute,
+  adminRoute,
+  getAllSubmissions
 );
 
+// =========================
+// Leaderboard
+// =========================
 router.get(
   "/leaderboard/:testId",
   protectRoute,
   getLeaderboardByTest
 );
 
+// =========================
+// Get Submission by Test
+// =========================
 router.get(
-    "/:submissionId",
-    protectRoute,
-    getSubmissionById
+  "/test/:testId",
+  protectRoute,
+  getSubmissionByTest
 );
 
+// =========================
+// Get Submission by ID
+// =========================
+router.get(
+  "/:submissionId",
+  protectRoute,
+  getSubmissionById
+);
+
+// =========================
+// Update Status (NO CHANGE - safe for admin/internal use)
+// =========================
 router.patch(
   "/:submissionId/status",
   updateSubmissionStatus
 );
 
-
+// =========================
+// Evaluate Question (IMPORTANT - ADD CHECK)
+// =========================
+router.post(
+  "/evaluate-question/:submissionId/:testId/:questionIndex",
+  protectRoute,
+  // checkTestTime,
+  evaluateQuestion
+);
+// =========================
+// Finish Submission (CRITICAL - MUST CHECK TIME)
+// =========================
+router.patch(
+  "/:submissionId/finish",
+  protectRoute,
+  // checkTestTime,
+  finishSubmission
+);
 
 export default router;

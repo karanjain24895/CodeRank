@@ -183,7 +183,7 @@ const Insights = () => {
         .filter((item) => {
           const itemTestId = String(item.test?._id || item.test);
           const isEvaluated =
-            item.isEvaluated || item.status === "evaluated";
+            item.isEvaluated || item.status === "evaluated" || item.isFinished;
 
           return itemTestId === currentTestId && isEvaluated;
         })
