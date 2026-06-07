@@ -10,7 +10,9 @@ export const reviewCode = async (
     spaceComplexity,
     marks
 ) => {
-    console.log(GROQ_API_KEY);
+    // console.log(GROQ_API_KEY);
+    console.log(problemTitle);
+    console.log(problemDescription);
     try {
         const response = await axios.post(
             "https://api.groq.com/openai/v1/chat/completions",
