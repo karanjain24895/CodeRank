@@ -4,7 +4,8 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 export const reviewCode = async (
     code,
-    problem,
+    problemTitle,
+    problemDescription,
     timeComplexity,
     spaceComplexity,
     marks
@@ -77,8 +78,10 @@ OUTPUT FORMAT (STRICT JSON ONLY)
                         role: "user",
                         content: `
 
-Problem Link:
-${problem}
+Problem Title: ${problemTitle}
+
+Problem Description:
+${problemDescription}
 
 Student Code:
 ${code}

@@ -61,6 +61,9 @@ export const createTest = async (
                     questionName:
                         question.questionName,
 
+                    description:
+                        question.description || "",
+
                     questionLink:
                         question.questionLink,
 
@@ -191,6 +194,31 @@ export const updateTest = async (
             0
         );
 
+        const formattedQuestions =
+            questions.map(
+                (
+                    question,
+                    index
+                ) => ({
+                    questionNumber:
+                        index + 1,
+
+                    questionName:
+                        question.questionName,
+
+                    description:
+                        question.description || "",
+
+                    questionLink:
+                        question.questionLink,
+
+                    marks:
+                        Number(
+                            question.marks
+                        ),
+                })
+            );
+
         const updatedTest =
             await Test.findByIdAndUpdate(
                 req.params.id,
@@ -200,7 +228,8 @@ export const updateTest = async (
                     fullMarks,
                     duration,
                     startDateTime,
-                    questions,
+                    questions:
+                        formattedQuestions,
                 },
                 {
                     new: true,
@@ -219,45 +248,45 @@ export const updateTest = async (
 
 // Delete Test
 export const deleteTest =
-  async (req, res) => {
+    async (req, res) => {
 
-    try {
+        try {
 
-      const {
-        testId,
-      } = req.params;
+            const {
+                testId,
+            } = req.params;
 
-      // Delete related submissions
-      await Submission.deleteMany({
-        test: testId,
-      });
+            // Delete related submissions
+            await Submission.deleteMany({
+                test: testId,
+            });
 
-      // Delete test
-      const deletedTest =
-        await Test.findByIdAndDelete(
-          testId
-        );
+            // Delete test
+            const deletedTest =
+                await Test.findByIdAndDelete(
+                    testId
+                );
 
-      if (!deletedTest) {
+            if (!deletedTest) {
 
-        return res.status(404).json({
-          message:
-            "Test not found",
-        });
-      }
+                return res.status(404).json({
+                    message:
+                        "Test not found",
+                });
+            }
 
-      res.status(200).json({
-        message:
-          "Test and related submissions deleted successfully",
-      });
+            res.status(200).json({
+                message:
+                    "Test and related submissions deleted successfully",
+            });
 
-    } catch (error) {
+        } catch (error) {
 
-      res.status(500).json({
-        message:
-          "Internal server error",
-        error:
-          error.message,
-      });
-    }
-  };
+            res.status(500).json({
+                message:
+                    "Internal server error",
+                error:
+                    error.message,
+            });
+        }
+    };

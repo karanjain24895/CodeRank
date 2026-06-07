@@ -34,13 +34,13 @@ const TestForm = () => {
   const [topicName, setTopicName] =
     useState("");
 
-const [instructions, setInstructions] =
-  useState([
-    "Using headphones is not allowed",
-    "Write the most optimal code otherwise partial marks will be given",
-    "Marks will be awarded based on marks in Code Studio platform",
-    "Write the Time Complexity and Space Complexity at the end in comments. It contains 6+4 marks respectively",
-  ]);
+  const [instructions, setInstructions] =
+    useState([
+      "Using headphones is not allowed",
+      "Write the most optimal code otherwise partial marks will be given",
+      "Marks will be awarded based on marks in Code Studio platform",
+      "Write the Time Complexity and Space Complexity at the end in comments. It contains 6+4 marks respectively",
+    ]);
 
   const [duration, setDuration] =
     useState("");
@@ -53,6 +53,7 @@ const [instructions, setInstructions] =
       {
         questionName: "",
         questionLink: "",
+        description: "",
         marks: "",
       },
     ]);
@@ -195,12 +196,12 @@ const [instructions, setInstructions] =
 
   // Add Question
   const addQuestion = () => {
-
     setQuestions([
       ...questions,
       {
         questionName: "",
         questionLink: "",
+        description: "",
         marks: "",
       },
     ]);
@@ -292,64 +293,64 @@ const [instructions, setInstructions] =
 
   // Submit
   const handleSubmit = async (
-  e
-) => {
+    e
+  ) => {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
+    try {
 
-    const formattedQuestions =
-      questions.map((q) => ({
-        ...q,
-        marks: Number(q.marks),
-      }));
+      const formattedQuestions =
+        questions.map((q) => ({
+          ...q,
+          marks: Number(q.marks),
+        }));
 
-    const testData = {
-      topicName,
-      instructions,
-      duration: Number(duration),
-      startDateTime,
-      questions:
-        formattedQuestions,
-    };
+      const testData = {
+        topicName,
+        instructions,
+        duration: Number(duration),
+        startDateTime,
+        questions:
+          formattedQuestions,
+      };
 
-    if (isEdit) {
+      if (isEdit) {
 
-      await axiosInstance.put(
-        `/test/${id}`,
-        testData,
-        {
-          headers: {
-            "x-admin-key":
-              "mysecretadminkey",
-          },
-        }
+        await axiosInstance.put(
+          `/test/${id}`,
+          testData,
+          {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
+        );
+
+      } else {
+
+        await axiosInstance.post(
+          "/test/create",
+          testData,
+          {
+            headers: {
+              "x-admin-key":
+                "mysecretadminkey",
+            },
+          }
+        );
+      }
+
+      navigate(
+        "/created-tests"
       );
 
-    } else {
+    } catch (error) {
 
-      await axiosInstance.post(
-        "/test/create",
-        testData,
-        {
-          headers: {
-            "x-admin-key":
-              "mysecretadminkey",
-          },
-        }
-      );
+      console.log(error);
     }
-
-    navigate(
-      "/created-tests"
-    );
-
-  } catch (error) {
-
-    console.log(error);
-  }
-};
+  };
 
   if (loading) {
 
@@ -726,6 +727,21 @@ const [instructions, setInstructions] =
                       />
 
                     </label>
+                    {/* Description */}
+                    <div className="md:col-span-3">
+                      <textarea
+                        placeholder="Question Description"
+                        className="textarea textarea-bordered w-full rounded-2xl min-h-32"
+                        value={question.description || ""}
+                        onChange={(e) =>
+                          handleQuestionChange(
+                            index,
+                            "description",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
 
                   </div>
 

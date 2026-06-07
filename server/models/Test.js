@@ -1,51 +1,70 @@
 import mongoose from "mongoose";
 
-const testSchema = new mongoose.Schema({
-
+const testSchema = new mongoose.Schema(
+  {
     topicName: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
 
     instructions: [
-        {
-            type: String,
-        }
+      {
+        type: String,
+      },
     ],
 
     duration: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
 
     startDateTime: {
-        type: Date,
-        required: true,
+      type: Date,
+      required: true,
     },
 
     fullMarks: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
 
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
 
     questions: [
-        {
-            questionNumber: Number,
-            questionName: String,
-            questionLink: String,
-            marks: Number,
-            // platform: String,
-            // difficulty: String,
-        }
-    ],
+      {
+        questionNumber: Number,
 
-}, {
+        questionName: {
+          type: String,
+          required: true,
+        },
+
+        description: {
+          type: String,
+          default: "",
+        },
+
+        questionLink: {
+          type: String,
+          required: true,
+        },
+
+        marks: {
+          type: Number,
+          required: true,
+        },
+
+        // platform: String,
+        // difficulty: String,
+      },
+    ],
+  },
+  {
     timestamps: true,
-});
+  }
+);
 
 export default mongoose.model("Test", testSchema);

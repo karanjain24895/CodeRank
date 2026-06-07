@@ -56,6 +56,7 @@ export const createSubmission = async (req, res) => {
     const questions = test.questions.map((q) => ({
       questionName: q.questionName,
       questionLink: q.questionLink,
+      questionDescription: q.description,
 
       submittedTimeComplexity: "",
       submittedSpaceComplexity: "",
@@ -570,6 +571,9 @@ export const evaluateQuestion = async (
               questionLink:
                 q.questionLink,
 
+              questionDescription:
+                q.description,
+
               submittedTimeComplexity:
                 "",
 
@@ -625,7 +629,8 @@ export const evaluateQuestion = async (
     const aiResult =
       await reviewCode(
         solution,
-        question.questionLink,
+        question.questionName,
+        question.questionDescription,
         timeComplexity,
         spaceComplexity,
         marks

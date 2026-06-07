@@ -6,6 +6,7 @@ import {
   ClipboardList,
   LogOut,
   PlusCircle,
+  ListPlus,
 } from "lucide-react";
 
 import {
@@ -54,6 +55,12 @@ const AdminNavbar = () => {
       icon: PlusCircle,
       end: true,
     },
+    {
+    name: "Add Questions",
+    path: "/add-questions",
+    icon: ListPlus,
+    end: true,
+  },
   ];
 
   return (
