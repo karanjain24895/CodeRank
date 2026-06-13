@@ -2,6 +2,85 @@ import Submission from "../models/Submission.js";
 import Test from "../models/Test.js";
 import { reviewCode } from "../services/aiReview.service.js";
 
+const getTestQuestions = (test) => {
+  if (test.testType === "mcq") {
+    return test.mcqQuestions.map((question) => ({
+      questionNumber: question.questionNumber,
+      questionName: question.questionText,
+      questionLink: "",
+      options: question.options,
+      selectedOption: null,
+      correctOption: question.correctOption,
+      mcqMarks: 0,
+      marks: question.marks,
+    }));
+  }
+
+  if (!test.questionRefs?.length) {
+    return test.questions;
+  }
+
+  return test.questionRefs
+    .map((ref) => {
+      const question = ref.questionId;
+
+      if (!question) return null;
+
+      return {
+        questionNumber: ref.questionNumber,
+        questionName: question.questionName,
+        description: question.description || "",
+        questionLink: question.questionLink,
+        marks: question.marks,
+        questionBankId: question._id,
+      };
+    })
+    .filter(Boolean);
+};
+
+const findTestWithQuestions = (testId) =>
+  Test.findById(testId).populate({
+    path: "questionRefs.questionId",
+    select:
+      "questionName questionLink description marks folderId",
+    populate: {
+      path: "folderId",
+      select: "name",
+    },
+  });
+
+const testSummaryPopulate = {
+  path: "test",
+  select:
+    "topicName fullMarks sourceType testType subject topicFolderIds",
+  populate: {
+    path: "topicFolderIds",
+    select: "name",
+  },
+};
+
+const hideMcqAnswersUntilFinished = (submission) => {
+  const plainSubmission =
+    typeof submission.toObject === "function"
+      ? submission.toObject()
+      : submission;
+
+  if (plainSubmission.isFinished) return plainSubmission;
+
+  plainSubmission.questions = plainSubmission.questions.map((question) => {
+    if (question.questionType !== "mcq") return question;
+
+    return {
+      ...question,
+      correctOption: null,
+      mcqMarks: 0,
+      isCorrect: false,
+    };
+  });
+
+  return plainSubmission;
+};
+
 // Create Submission
 export const createSubmission = async (req, res) => {
   try {
@@ -10,7 +89,7 @@ export const createSubmission = async (req, res) => {
     // =========================
     // Fetch Test
     // =========================
-    const test = await Test.findById(testId);
+    const test = await findTestWithQuestions(testId);
 
     if (!test) {
       return res.status(404).json({
@@ -53,9 +132,18 @@ export const createSubmission = async (req, res) => {
     // =========================
     // Build questions (UNCHANGED)
     // =========================
-    const questions = test.questions.map((q) => ({
+    const testQuestions = getTestQuestions(test);
+
+    const questions = testQuestions.map((q) => ({
+      questionType: test.testType === "mcq" ? "mcq" : "coding",
       questionName: q.questionName,
-      questionLink: q.questionLink,
+      questionLink: q.questionLink || "",
+      options: q.options || [],
+      selectedOption: null,
+      correctOption:
+        typeof q.correctOption === "number" ? q.correctOption : null,
+      mcqMarks: 0,
+      isCorrect: false,
 
       submittedTimeComplexity: "",
       submittedSpaceComplexity: "",
@@ -75,9 +163,12 @@ export const createSubmission = async (req, res) => {
     // =========================
     const startTime = new Date();
 
-    const endTime = new Date(
-      startTime.getTime() + test.duration * 60 * 60 * 1000
-    );
+    const durationMs =
+      test.testType === "mcq"
+        ? test.duration * 60 * 1000
+        : test.duration * 60 * 60 * 1000;
+
+    const endTime = new Date(startTime.getTime() + durationMs);
 
     // =========================
     // CREATE SUBMISSION (UNCHANGED + EXTENDED)
@@ -97,7 +188,7 @@ export const createSubmission = async (req, res) => {
       submittedAt: null,
     });
 
-    return res.status(201).json(submission);
+    return res.status(201).json(hideMcqAnswersUntilFinished(submission));
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
@@ -127,7 +218,7 @@ export const submitTest =
 
             // Get Test
             const test =
-                await Test.findById(
+                await findTestWithQuestions(
                     req.params.testId
                 );
 
@@ -140,10 +231,22 @@ export const submitTest =
             }
 
             // Copy Questions
-const questions = test.questions.map(
+const testQuestions = getTestQuestions(test);
+
+const questions = testQuestions.map(
   (question, index) => ({
+    questionType: test.testType === "mcq" ? "mcq" : "coding",
     questionName: question.questionName,
-    questionLink: question.questionLink,
+    questionLink: question.questionLink || "",
+    options: question.options || [],
+    selectedOption:
+      typeof req.body.questions?.[index]?.selectedOption === "number"
+        ? req.body.questions[index].selectedOption
+        : null,
+    correctOption:
+      typeof question.correctOption === "number" ? question.correctOption : null,
+    mcqMarks: 0,
+    isCorrect: false,
 
     submittedTimeComplexity:
       req.body.questions?.[index]
@@ -177,7 +280,7 @@ const questions = test.questions.map(
                 });
 
             res.status(201).json(
-                submission
+                hideMcqAnswersUntilFinished(submission)
             );
 
         } catch (error) {
@@ -201,15 +304,14 @@ export const getUserSubmissions =
                     user:
                         req.user._id,
                 })
-                    .populate(
-                        "test",
-                        "topicName fullMarks"
-                    )
+                    .populate(testSummaryPopulate)
                     .sort({
                         createdAt: -1,
                     });
 
-            res.json(submissions);
+            res.json(
+                submissions.map(hideMcqAnswersUntilFinished)
+            );
 
         } catch (error) {
 
@@ -232,10 +334,7 @@ export const getPendingSubmissions =
                     status: "pending",
                 })
                     .populate("user", "username")
-                    .populate(
-                        "test",
-                        "topicName fullMarks"
-                    )
+                    .populate(testSummaryPopulate)
                     .sort({
                         createdAt: -1,
                     });
@@ -258,15 +357,17 @@ export const getSubmissionById =
 
         try {
 
+            const submissionQuery = req.user?.isAdmin
+                ? { _id: req.params.submissionId }
+                : {
+                    _id: req.params.submissionId,
+                    user: req.user._id,
+                };
+
             const submission =
-                await Submission.findById(
-                    req.params.submissionId
-                )
+                await Submission.findOne(submissionQuery)
                     .populate("user", "username")
-                    .populate(
-                        "test",
-                        "topicName fullMarks"
-                    )
+                    .populate(testSummaryPopulate)
 
             if (!submission) {
 
@@ -277,7 +378,7 @@ export const getSubmissionById =
             }
 
             res.json(
-                submission
+                hideMcqAnswersUntilFinished(submission)
             );
 
         } catch (error) {
@@ -302,9 +403,10 @@ export const updateSubmissionStatus =
         req.body;
 
       const submission =
-        await Submission.findById(
-          submissionId
-        );
+        await Submission.findOne({
+          _id: submissionId,
+          user: req.user._id,
+        });
 
       if (!submission) {
 
@@ -413,10 +515,7 @@ export const getAllSubmissions = async (
     try {
         const submissions = await Submission.find({})
             .populate("user", "username name email")
-            .populate(
-                "test",
-                "topicName fullMarks"
-            )
+            .populate(testSummaryPopulate)
             .sort({
                 createdAt: -1,
             });
@@ -470,6 +569,7 @@ export const getLeaderboardByTest = async (
                   question
                 ) =>
                   total +
+                  (question.mcqMarks || 0) +
                   question.codingMarks +
                   question.timeComplexityMarks +
                   question.spaceComplexityMarks,
@@ -541,7 +641,7 @@ export const evaluateQuestion = async (
     }
 
     const test =
-      await Test.findById(testId);
+      await findTestWithQuestions(testId);
 
     if (!test) {
       return res.status(404).json({
@@ -563,7 +663,7 @@ export const evaluateQuestion = async (
           test: testId,
           status: "pending",
           questions:
-            test.questions.map((q) => ({
+            getTestQuestions(test).map((q) => ({
               questionName:
                 q.questionName,
 
@@ -624,9 +724,9 @@ export const evaluateQuestion = async (
     // =========================
 
     const testQuestion =
-  test.questions[
-    Number(questionIndex)
-  ];
+      getTestQuestions(test)[
+        Number(questionIndex)
+      ];
 
     const aiResult =
       await reviewCode(
@@ -711,7 +811,26 @@ export const finishSubmission =
       submission.isFinished =
         true;
 
-      
+      submission.questions.forEach((question) => {
+        if (question.questionType !== "mcq") return;
+
+        question.isCorrect =
+          question.selectedOption !== null &&
+          question.selectedOption === question.correctOption;
+
+        question.mcqMarks = question.isCorrect ? 1 : 0;
+        question.isSolved = question.isCorrect;
+        question.isEvaluated = true;
+      });
+
+      if (
+        submission.questions.length &&
+        submission.questions.every((question) => question.questionType === "mcq")
+      ) {
+        submission.isEvaluated = true;
+        submission.status = "evaluated";
+        submission.evaluatedAt = new Date();
+      }
 
       submission.submittedAt =
         new Date();
@@ -751,7 +870,7 @@ export const finishSubmission =
     }
 
     res.status(200).json(
-      submission
+      hideMcqAnswersUntilFinished(submission)
     );
   } catch (error) {
     res.status(500).json({
@@ -759,6 +878,67 @@ export const finishSubmission =
         "Internal server error",
       error:
         error.message,
+    });
+  }
+};
+
+export const saveMcqAnswer = async (req, res) => {
+  try {
+    const { submissionId, questionIndex } = req.params;
+    const { selectedOption } = req.body;
+
+    if (selectedOption === null || selectedOption === undefined) {
+      return res.status(400).json({
+        message: "Please select a valid option",
+      });
+    }
+
+    const optionIndex = Number(selectedOption);
+
+    if (!Number.isInteger(optionIndex) || optionIndex < 0 || optionIndex > 3) {
+      return res.status(400).json({
+        message: "Please select a valid option",
+      });
+    }
+
+    const submission = await Submission.findOne({
+      _id: submissionId,
+      user: req.user._id,
+    });
+
+    if (!submission) {
+      return res.status(404).json({
+        message: "Submission not found",
+      });
+    }
+
+    if (submission.isFinished) {
+      return res.status(400).json({
+        message: "Submitted tests cannot be changed",
+      });
+    }
+
+    const question = submission.questions[Number(questionIndex)];
+
+    if (!question || question.questionType !== "mcq") {
+      return res.status(404).json({
+        message: "MCQ question not found",
+      });
+    }
+
+    question.selectedOption = optionIndex;
+
+    await submission.save();
+
+    return res.status(200).json({
+      message: "Answer saved",
+      question,
+      submission: hideMcqAnswersUntilFinished(submission),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
     });
   }
 };

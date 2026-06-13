@@ -5,8 +5,9 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import QuestionCard from "../../components/QuestionCard";
 import ConfirmBox from "../../components/ConfirmBox";
+import McqTestView from "../../components/McqTestView";
 
-import { Clock3, Trophy, BookOpen } from "lucide-react";
+import { Clock3, Trophy, BookOpen, Tags } from "lucide-react";
 
 import axiosInstance from "../../lib/axios";
 
@@ -26,6 +27,9 @@ const CodingTest = () => {
 
   const [complexityAnswers, setComplexityAnswers] = useState([]);
   const [questionResults, setQuestionResults] = useState([]);
+  const [mcqAnswers, setMcqAnswers] = useState([]);
+  const [savedMcqAnswers, setSavedMcqAnswers] = useState([]);
+  const [savingAnswer, setSavingAnswer] = useState(false);
   // const [timerStarted, setTimerStarted] = useState(false);
 
   useEffect(() => {
@@ -97,6 +101,10 @@ const CodingTest = () => {
   }))
 );
 
+      const emptyMcqAnswers = testRes.data.questions.map(() => null);
+      setMcqAnswers(emptyMcqAnswers);
+      setSavedMcqAnswers(emptyMcqAnswers);
+
       // Check if submission already exists
       try {
         const submissionRes =
@@ -145,8 +153,17 @@ const CodingTest = () => {
         q.remarks || "",
     }))
   );
+
+  const restoredMcqAnswers = submission.questions.map((q) =>
+      typeof q.selectedOption === "number"
+        ? q.selectedOption
+        : null
+  );
+
+  setMcqAnswers(restoredMcqAnswers);
+  setSavedMcqAnswers(restoredMcqAnswers);
 }
-      } catch (error) {
+      } catch {
         // No submission found
         setShowInstructions(true);
       }
@@ -165,6 +182,15 @@ const startTest = async () => {
     });
 
     setSubmissionId(res.data._id);
+    const restoredMcqAnswers =
+      res.data.questions?.map((q) =>
+        typeof q.selectedOption === "number"
+          ? q.selectedOption
+          : null
+      ) || [];
+
+    setMcqAnswers(restoredMcqAnswers);
+    setSavedMcqAnswers(restoredMcqAnswers);
     setShowInstructions(false);
 
     // const startTime = Date.now();
@@ -235,9 +261,61 @@ const handleSubmit = async () => {
       `/submissions/${id}/finish`
     );
 
-    navigate("/attempted-tests");
+    if (test?.testType === "mcq") {
+      navigate(`/insights/${id}`);
+    } else {
+      navigate("/attempted-tests");
+    }
   } catch (error) {
     console.log(error);
+  }
+};
+
+const handleMcqOptionChange = (optionIndex) => {
+  setMcqAnswers((prev) => {
+    const updated = [...prev];
+    updated[selectedQuestion] = optionIndex;
+    return updated;
+  });
+};
+
+const handleMcqSaveAndNext = async () => {
+  if (!submissionId) {
+    return alert("Please start the test first");
+  }
+
+  const selectedOption = mcqAnswers[selectedQuestion];
+
+  if (typeof selectedOption !== "number") {
+    return alert("Please select an option");
+  }
+
+  try {
+    setSavingAnswer(true);
+
+    await axiosInstance.patch(
+      `/submissions/${submissionId}/mcq/${selectedQuestion}`,
+      { selectedOption }
+    );
+
+    setSavedMcqAnswers((prev) => {
+      const updated = [...prev];
+      updated[selectedQuestion] = selectedOption;
+      return updated;
+    });
+
+    if (selectedQuestion < test.questions.length - 1) {
+      setSelectedQuestion((prev) => prev + 1);
+    } else {
+      setShowSubmitConfirm(true);
+    }
+  } catch (error) {
+    alert(
+      error.response?.data?.message ||
+        "Failed to save answer"
+    );
+  } finally {
+    setSavingAnswer(false);
   }
 };
 
@@ -265,6 +343,29 @@ const handleSubmit = async () => {
     );
   }
 
+  if (test.testType === "mcq") {
+    return (
+      <McqTestView
+        test={test}
+        selectedQuestion={selectedQuestion}
+        mcqAnswers={mcqAnswers}
+        savedMcqAnswers={savedMcqAnswers}
+        savingAnswer={savingAnswer}
+        showInstructions={showInstructions}
+        showSubmitConfirm={showSubmitConfirm}
+        onStart={startTest}
+        onSelectQuestion={setSelectedQuestion}
+        onSelectOption={handleMcqOptionChange}
+        onSaveAndNext={handleMcqSaveAndNext}
+        onSubmitClick={() => setShowSubmitConfirm(true)}
+        onCancelSubmit={() => setShowSubmitConfirm(false)}
+        onConfirmSubmit={() => {
+          setShowSubmitConfirm(false);
+          handleSubmit();
+        }}
+      />
+    );
+  }
   return (
     <>
       {showInstructions && (
@@ -279,6 +380,21 @@ const handleSubmit = async () => {
                 Read all instructions carefully before
                 starting.
               </p>
+
+              {test.topics?.length > 0 && (
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  <Tags size={15} />
+
+                  {test.topics.map((topic) => (
+                    <span
+                      key={topic._id || topic.name}
+                      className="badge badge-outline border-primary-content/50 text-primary-content rounded-md px-2 py-2 text-[11px] font-medium"
+                    >
+                      {topic.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
@@ -526,4 +642,5 @@ onEvaluationComplete={(
 };
 
 export default CodingTest;
+
 

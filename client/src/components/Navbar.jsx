@@ -1,13 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { LogOut, User } from "lucide-react";
+import { Code2, ListChecks, LogOut } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import axiosInstance from "../lib/axios";
+import GenerateTestModal from "./GenerateTestModal";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { authUser, setAuthUser } = useAuthStore();
   const [open, setOpen] = useState(false);
+  const [showGenerateTest, setShowGenerateTest] = useState(false);
+  const [generateMode, setGenerateMode] = useState("coding");
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -41,6 +44,11 @@ const Navbar = () => {
     `rounded-xl px-3 h-9 min-h-0 text-sm btn border-none transition-all duration-200 ${
       isActive ? "bg-primary text-primary-content" : "btn-ghost"
     }`;
+
+  const openGenerateModal = (mode) => {
+    setGenerateMode(mode);
+    setShowGenerateTest(true);
+  };
 
   // initials for avatar
   const getInitials = (name = "") =>
@@ -85,6 +93,24 @@ const Navbar = () => {
                 Attempted Tests
               </NavLink>
 
+              <button
+                type="button"
+                onClick={() => openGenerateModal("coding")}
+                className="btn btn-primary rounded-xl px-3 h-9 min-h-0 text-sm gap-2"
+              >
+                <Code2 size={15} />
+                Generate Coding Test
+              </button>
+
+              <button
+                type="button"
+                onClick={() => openGenerateModal("mcq")}
+                className="btn btn-secondary rounded-xl px-3 h-9 min-h-0 text-sm gap-2"
+              >
+                <ListChecks size={15} />
+                Generate MCQ Test
+              </button>
+
               {/* PROFILE DROPDOWN */}
               <div className="relative" ref={dropdownRef}>
                 
@@ -123,6 +149,12 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      <GenerateTestModal
+        isOpen={showGenerateTest}
+        mode={generateMode}
+        onClose={() => setShowGenerateTest(false)}
+      />
     </div>
   );
 };

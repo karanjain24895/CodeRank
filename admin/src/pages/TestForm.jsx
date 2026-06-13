@@ -18,6 +18,8 @@ import {
   CalendarClock,
   Link2,
   Trophy,
+  CheckCircle2,
+  Tags,
 } from "lucide-react";
 
 const TestForm = () => {
@@ -57,6 +59,24 @@ const TestForm = () => {
         marks: "",
       },
     ]);
+
+  const [folders, setFolders] =
+    useState([]);
+
+  const [selectedFolderId, setSelectedFolderId] =
+    useState("");
+
+  const [folderQuestions, setFolderQuestions] =
+    useState([]);
+
+  const [selectedQuestions, setSelectedQuestions] =
+    useState([]);
+
+  const [loadingQuestions, setLoadingQuestions] =
+    useState(false);
+
+  const [legacyQuestionMode, setLegacyQuestionMode] =
+    useState(false);
 
   // Prevent accidental back / refresh
   useEffect(() => {
@@ -122,6 +142,68 @@ const TestForm = () => {
 
   }, [navigate]);
 
+  useEffect(() => {
+
+    const fetchFolders = async () => {
+
+      try {
+
+        const res =
+          await axiosInstance.get(
+            "/question-folders"
+          );
+
+        setFolders(
+          res.data.folders || []
+        );
+
+      } catch (error) {
+
+        console.log(error);
+      }
+    };
+
+    fetchFolders();
+
+  }, []);
+
+  useEffect(() => {
+
+    if (!selectedFolderId) {
+
+      setFolderQuestions([]);
+      return;
+    }
+
+    const fetchFolderQuestions = async () => {
+
+      try {
+
+        setLoadingQuestions(true);
+
+        const res =
+          await axiosInstance.get(
+            `/question-bank/folder/${selectedFolderId}`
+          );
+
+        setFolderQuestions(
+          res.data.questions || []
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+      } finally {
+
+        setLoadingQuestions(false);
+      }
+    };
+
+    fetchFolderQuestions();
+
+  }, [selectedFolderId]);
+
   // Fetch Existing Test
   useEffect(() => {
 
@@ -165,9 +247,47 @@ const TestForm = () => {
           )
         );
 
-        setQuestions(
-          test.questions
+        const hasBankQuestions =
+          test.questions?.some(
+            (question) =>
+              question.questionBankId
+          );
+
+        setLegacyQuestionMode(
+          isEdit && !hasBankQuestions
         );
+
+        if (hasBankQuestions) {
+
+          setSelectedQuestions(
+            test.questions.map((question) => ({
+              _id:
+                question.questionBankId,
+              folderId:
+                question.folderId,
+              questionName:
+                question.questionName,
+              questionLink:
+                question.questionLink,
+              description:
+                question.description || "",
+              marks:
+                question.marks,
+            }))
+          );
+
+          setSelectedFolderId(
+            test.questions[0]?.folderId ||
+            test.topicFolderIds?.[0]?._id ||
+            ""
+          );
+
+        } else {
+
+          setQuestions(
+            test.questions
+          );
+        }
 
       } catch (error) {
 
@@ -184,7 +304,12 @@ const TestForm = () => {
   }, [id, isEdit]);
 
   // Dynamic Full Marks
-  const fullMarks = questions.reduce(
+  const activeQuestions =
+    legacyQuestionMode
+      ? questions
+      : selectedQuestions;
+
+  const fullMarks = activeQuestions.reduce(
     (total, q) => {
       return (
         total +
@@ -193,6 +318,53 @@ const TestForm = () => {
     },
     0
   );
+
+  const selectedQuestionIds =
+    selectedQuestions.map(
+      (question) => question._id
+    );
+
+  const selectedQuestionIdSet =
+    new Set(selectedQuestionIds);
+
+  const toggleQuestionSelection = (
+    question
+  ) => {
+
+    setSelectedQuestions((prev) => {
+
+      const exists =
+        prev.some(
+          (item) =>
+            item._id === question._id
+        );
+
+      if (exists) {
+
+        return prev.filter(
+          (item) =>
+            item._id !== question._id
+        );
+      }
+
+      return [
+        ...prev,
+        question,
+      ];
+    });
+  };
+
+  const removeSelectedQuestion = (
+    questionId
+  ) => {
+
+    setSelectedQuestions((prev) =>
+      prev.filter(
+        (question) =>
+          question._id !== questionId
+      )
+    );
+  };
 
   // Add Question
   const addQuestion = () => {
@@ -300,20 +472,43 @@ const TestForm = () => {
 
     try {
 
-      const formattedQuestions =
-        questions.map((q) => ({
-          ...q,
-          marks: Number(q.marks),
-        }));
+      const selectedTopicFolderIds = [
+        ...new Set(
+          selectedQuestions
+            .map((question) =>
+              question.folderId?._id ||
+              question.folderId
+            )
+            .filter(Boolean)
+        ),
+      ];
 
-      const testData = {
-        topicName,
-        instructions,
-        duration: Number(duration),
-        startDateTime,
-        questions:
-          formattedQuestions,
-      };
+      const testData =
+        legacyQuestionMode
+          ? {
+              topicName,
+              instructions,
+              duration:
+                Number(duration),
+              startDateTime,
+              questions:
+                questions.map((q) => ({
+                  ...q,
+                  marks:
+                    Number(q.marks),
+                })),
+            }
+          : {
+              topicName,
+              instructions,
+              duration:
+                Number(duration),
+              startDateTime,
+              questionIds:
+                selectedQuestionIds,
+              topicFolderIds:
+                selectedTopicFolderIds,
+            };
 
       if (isEdit) {
 
@@ -596,177 +791,346 @@ const TestForm = () => {
         {/* Questions */}
         <div className="bg-base-100 border border-base-300 rounded-3xl p-8 shadow-md">
 
-          {/* Heading */}
           <div className="mb-8 text-center">
 
             <h2 className="text-3xl font-bold">
               Questions
             </h2>
 
+            {!legacyQuestionMode && (
+              <p className="text-base-content/60 mt-2">
+                Select a topic, then choose questions from Question Bank.
+              </p>
+            )}
           </div>
 
-          {/* Questions List */}
-          <div className="space-y-6">
+          {legacyQuestionMode ? (
+            <>
+              <div className="alert alert-warning mb-6">
+                This older test stores embedded questions. It can still be edited here, but new tests use Question Bank questions.
+              </div>
 
-            {questions.map(
-              (
-                question,
-                index
-              ) => (
+              <div className="space-y-6">
 
-                <div
-                  key={index}
-                  className="bg-base-200 rounded-3xl p-6 border border-base-300"
+                {questions.map(
+                  (
+                    question,
+                    index
+                  ) => (
+
+                    <div
+                      key={index}
+                      className="bg-base-200 rounded-3xl p-6 border border-base-300"
+                    >
+
+                      <div className="flex items-center justify-between mb-6">
+
+                        <div className="flex items-center gap-4">
+
+                          <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold">
+                            {index + 1}
+                          </div>
+
+                          <div>
+
+                            <h3 className="text-2xl font-bold">
+                              Question {index + 1}
+                            </h3>
+
+                            <p className="text-base-content/60">
+                              Legacy question details
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            removeQuestion(
+                              index
+                            )
+                          }
+                          className="btn btn-error btn-square rounded-2xl"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                        <label className="input input-bordered rounded-2xl flex items-center gap-3 h-14">
+
+                          <FileText size={20} />
+
+                          <input
+                            type="text"
+                            placeholder="Question Name"
+                            className="grow"
+                            value={
+                              question.questionName
+                            }
+                            onChange={(e) =>
+                              handleQuestionChange(
+                                index,
+                                "questionName",
+                                e.target.value
+                              )
+                            }
+                          />
+
+                        </label>
+
+                        <label className="input input-bordered rounded-2xl flex items-center gap-3 h-14">
+
+                          <Link2 size={20} />
+
+                          <input
+                            type="url"
+                            placeholder="Question Link"
+                            className="grow"
+                            value={
+                              question.questionLink
+                            }
+                            onChange={(e) =>
+                              handleQuestionChange(
+                                index,
+                                "questionLink",
+                                e.target.value
+                              )
+                            }
+                          />
+
+                        </label>
+
+                        <label className="input input-bordered rounded-2xl flex items-center gap-3 h-14">
+
+                          <Trophy size={20} />
+
+                          <input
+                            type="text"
+                            placeholder="Marks"
+                            className="grow"
+                            value={
+                              question.marks
+                            }
+                            onChange={(e) =>
+                              handleQuestionChange(
+                                index,
+                                "marks",
+                                e.target.value
+                              )
+                            }
+                          />
+
+                        </label>
+
+                        <div className="md:col-span-3">
+                          <textarea
+                            placeholder="Question Description"
+                            className="textarea textarea-bordered w-full rounded-2xl min-h-32"
+                            value={question.description || ""}
+                            onChange={(e) =>
+                              handleQuestionChange(
+                                index,
+                                "description",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+
+                      </div>
+
+                    </div>
+                  )
+                )}
+
+              </div>
+
+              <div className="flex justify-center mt-8">
+
+                <button
+                  type="button"
+                  onClick={addQuestion}
+                  className="btn btn-primary rounded-2xl px-8 h-14 text-lg"
                 >
 
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-6">
+                  <Plus size={20} />
 
-                    <div className="flex items-center gap-4">
+                  Add Question
 
-                      <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold">
-                        {index + 1}
-                      </div>
+                </button>
 
-                      <div>
+              </div>
+            </>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
-                        <h3 className="text-2xl font-bold">
-                          Question {index + 1}
-                        </h3>
+              <div className="xl:col-span-5 space-y-4">
 
-                        <p className="text-base-content/60">
-                          Add question details
-                        </p>
+                <label className="form-control">
+                  <span className="label-text font-medium mb-2">
+                    Topic
+                  </span>
 
-                      </div>
+                  <select
+                    className="select select-bordered rounded-2xl h-14"
+                    value={selectedFolderId}
+                    onChange={(e) =>
+                      setSelectedFolderId(
+                        e.target.value
+                      )
+                    }
+                  >
+                    <option value="">
+                      Select topic
+                    </option>
 
-                    </div>
+                    {folders.map((folder) => (
+                      <option
+                        key={folder._id}
+                        value={folder._id}
+                      >
+                        {folder.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        removeQuestion(
-                          index
-                        )
-                      }
-                      className="btn btn-error btn-square rounded-2xl"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-
+                <div className="bg-base-200 rounded-3xl border border-base-300 min-h-96 overflow-hidden">
+                  <div className="px-5 py-4 border-b border-base-300 flex items-center gap-2">
+                    <Tags size={18} />
+                    <h3 className="font-bold">
+                      Available Questions
+                    </h3>
                   </div>
 
-                  {/* Inputs */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="p-4 max-h-[28rem] overflow-y-auto space-y-3">
+                    {!selectedFolderId ? (
+                      <div className="text-center text-base-content/60 py-16">
+                        Select a topic to view questions.
+                      </div>
+                    ) : loadingQuestions ? (
+                      <div className="flex justify-center py-16">
+                        <span className="loading loading-spinner loading-lg"></span>
+                      </div>
+                    ) : folderQuestions.length === 0 ? (
+                      <div className="text-center text-base-content/60 py-16">
+                        No questions found in this topic.
+                      </div>
+                    ) : (
+                      folderQuestions.map((question) => {
+                        const isSelected =
+                          selectedQuestionIdSet.has(
+                            question._id
+                          );
 
-                    {/* Question Name */}
-                    <label className="input input-bordered rounded-2xl flex items-center gap-3 h-14">
+                        return (
+                          <button
+                            type="button"
+                            key={question._id}
+                            onClick={() =>
+                              toggleQuestionSelection(
+                                question
+                              )
+                            }
+                            className={`w-full text-left rounded-2xl border p-4 transition ${
+                              isSelected
+                                ? "border-primary bg-primary/10"
+                                : "border-base-300 bg-base-100 hover:border-primary"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <h4 className="font-bold truncate">
+                                  {question.questionName}
+                                </h4>
 
-                      <FileText size={20} />
+                                <p className="text-xs text-base-content/60 mt-1">
+                                  {question.marks} marks
+                                </p>
+                              </div>
 
-                      <input
-                        type="text"
-                        placeholder="Question Name"
-                        className="grow"
-                        value={
-                          question.questionName
-                        }
-                        onChange={(e) =>
-                          handleQuestionChange(
-                            index,
-                            "questionName",
-                            e.target.value
-                          )
-                        }
-                      />
-
-                    </label>
-
-                    {/* Question Link */}
-                    <label className="input input-bordered rounded-2xl flex items-center gap-3 h-14">
-
-                      <Link2 size={20} />
-
-                      <input
-                        type="url"
-                        placeholder="Question Link"
-                        className="grow"
-                        value={
-                          question.questionLink
-                        }
-                        onChange={(e) =>
-                          handleQuestionChange(
-                            index,
-                            "questionLink",
-                            e.target.value
-                          )
-                        }
-                      />
-
-                    </label>
-
-                    {/* Marks */}
-                    <label className="input input-bordered rounded-2xl flex items-center gap-3 h-14">
-
-                      <Trophy size={20} />
-
-                      <input
-                        type="text"
-                        placeholder="Marks"
-                        className="grow"
-                        value={
-                          question.marks
-                        }
-                        onChange={(e) =>
-                          handleQuestionChange(
-                            index,
-                            "marks",
-                            e.target.value
-                          )
-                        }
-                      />
-
-                    </label>
-                    {/* Description */}
-                    <div className="md:col-span-3">
-                      <textarea
-                        placeholder="Question Description"
-                        className="textarea textarea-bordered w-full rounded-2xl min-h-32"
-                        value={question.description || ""}
-                        onChange={(e) =>
-                          handleQuestionChange(
-                            index,
-                            "description",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-
+                              {isSelected && (
+                                <CheckCircle2
+                                  size={20}
+                                  className="text-primary shrink-0"
+                                />
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
                   </div>
-
                 </div>
-              )
-            )}
+              </div>
 
-          </div>
+              <div className="xl:col-span-7 bg-base-200 rounded-3xl border border-base-300 overflow-hidden">
+                <div className="px-5 py-4 border-b border-base-300 flex items-center justify-between gap-3">
+                  <div>
+                    <h3 className="font-bold">
+                      Selected Questions
+                    </h3>
 
-          {/* Add Question Button */}
-          <div className="flex justify-center mt-8">
+                    <p className="text-xs text-base-content/60 mt-1">
+                      {selectedQuestions.length} selected
+                    </p>
+                  </div>
 
-            <button
-              type="button"
-              onClick={addQuestion}
-              className="btn btn-primary rounded-2xl px-8 h-14 text-lg"
-            >
+                  <div className="badge badge-primary rounded-xl px-4 py-3">
+                    {fullMarks} marks
+                  </div>
+                </div>
 
-              <Plus size={20} />
+                <div className="p-4 max-h-[34rem] overflow-y-auto space-y-3">
+                  {selectedQuestions.length === 0 ? (
+                    <div className="text-center text-base-content/60 py-20">
+                      Selected questions will appear here.
+                    </div>
+                  ) : (
+                    selectedQuestions.map(
+                      (question, index) => (
+                        <div
+                          key={question._id}
+                          className="bg-base-100 border border-base-300 rounded-2xl p-4 flex items-start gap-4"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
+                            {index + 1}
+                          </div>
 
-              Add Question
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-bold truncate">
+                              {question.questionName}
+                            </h4>
 
-            </button>
+                            <p className="text-xs text-base-content/60 mt-1">
+                              {question.marks} marks
+                            </p>
+                          </div>
 
-          </div>
+                          <button
+                            type="button"
+                            className="btn btn-error btn-sm btn-square rounded-xl"
+                            onClick={() =>
+                              removeSelectedQuestion(
+                                question._id
+                              )
+                            }
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      )
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
 

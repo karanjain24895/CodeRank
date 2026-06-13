@@ -13,6 +13,7 @@ import {
   evaluateQuestion,
   finishSubmission,
   getSubmissionByTest,
+  saveMcqAnswer,
 } from "../controllers/submission.controller.js";
 
 import protectRoute from "../middleware/protectRoute.js";
@@ -97,6 +98,12 @@ router.get(
   getSubmissionByTest
 );
 
+router.patch(
+  "/:submissionId/mcq/:questionIndex",
+  protectRoute,
+  saveMcqAnswer
+);
+
 // =========================
 // Get Submission by ID
 // =========================
@@ -111,6 +118,8 @@ router.get(
 // =========================
 router.patch(
   "/:submissionId/status",
+  protectRoute,
+  adminRoute,
   updateSubmissionStatus
 );
 

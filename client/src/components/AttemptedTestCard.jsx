@@ -11,11 +11,14 @@ import {
   ArrowRight,
   Sparkles,
   Clock3,
+  Tags,
 } from "lucide-react";
 
 const AttemptedTestCard = ({
 
   topicName,
+
+  topics = [],
 
   scoredMarks,
 
@@ -27,8 +30,6 @@ const AttemptedTestCard = ({
 
   submissionId,
 
-  status,
-  
   finished,
 
 }) => {
@@ -51,11 +52,9 @@ const AttemptedTestCard = ({
       : 0;
 
   // Performance
-  let performance =
-    "";
+  let performance;
 
-  let performanceColor =
-    "";
+  let performanceColor;
 
   if (percentage < 30) {
 
@@ -121,6 +120,21 @@ const AttemptedTestCard = ({
         <h2 className="text-xl sm:text-2xl font-bold text-base-content">
           {topicName}
         </h2>
+
+        {topics.length > 0 && (
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <Tags size={14} className="text-primary" />
+
+            {topics.map((topic) => (
+              <span
+                key={topic._id || topic.name}
+                className="badge badge-outline rounded-md px-2 py-2 text-[11px] font-medium"
+              >
+                {topic.name}
+              </span>
+            ))}
+          </div>
+        )}
 
       </div>
 

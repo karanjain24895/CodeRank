@@ -94,6 +94,9 @@ const CreatedTests = () => {
                 topicName={
                   test.topicName
                 }
+                topics={
+                  test.topics || []
+                }
               />
             )
           )

@@ -18,7 +18,6 @@ const QuestionCard = ({
   testId,
   questionIndex,
   submissionId,
-  setSubmissionId,
 
   questionNumber,
   title,

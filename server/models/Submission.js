@@ -57,7 +57,7 @@ const submissionSchema = new mongoose.Schema(
     },
 
     duration: {
-      type: Number, // in hours (copied from Test for reference)
+      type: Number, // coding: hours, MCQ: minutes
       default: null,
     },
 
@@ -66,6 +66,12 @@ const submissionSchema = new mongoose.Schema(
     // =========================
     questions: [
       {
+        questionType: {
+          type: String,
+          enum: ["coding", "mcq"],
+          default: "coding",
+        },
+
         questionName: {
           type: String,
           required: true,
@@ -73,7 +79,39 @@ const submissionSchema = new mongoose.Schema(
 
         questionLink: {
           type: String,
-          required: true,
+          default: "",
+        },
+
+        options: [
+          {
+            type: String,
+            trim: true,
+          },
+        ],
+
+        selectedOption: {
+          type: Number,
+          default: null,
+          min: 0,
+          max: 3,
+        },
+
+        correctOption: {
+          type: Number,
+          default: null,
+          min: 0,
+          max: 3,
+        },
+
+        mcqMarks: {
+          type: Number,
+          default: 0,
+          min: 0,
+        },
+
+        isCorrect: {
+          type: Boolean,
+          default: false,
         },
 
         submittedTimeComplexity: {
@@ -139,6 +177,7 @@ submissionSchema.virtual(
 
       return (
         total +
+        (question.mcqMarks || 0) +
         question.codingMarks +
         question.timeComplexityMarks +
         question.spaceComplexityMarks

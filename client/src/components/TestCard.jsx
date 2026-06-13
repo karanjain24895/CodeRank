@@ -6,13 +6,16 @@ import {
     Trophy,
     CalendarDays,
     BookOpen,
+    Tags,
 } from "lucide-react";
 
 const TestCard = ({
     testId,
     topicName,
+    testType = "coding",
     fullMarks,
     duration,
+    topics = [],
     questionsCount,
     liveDateTime,
 }) => {
@@ -21,6 +24,10 @@ const TestCard = ({
     const [isLive, setIsLive] = useState(false);
 
     const navigate = useNavigate();
+    const durationLabel =
+        testType === "mcq"
+            ? `${duration} Minutes`
+            : `${duration} Hours`;
 
     useEffect(() => {
 
@@ -96,6 +103,21 @@ const TestCard = ({
                     <h2 className="text-xl sm:text-2xl font-bold text-base-content">
                         {topicName}
                     </h2>
+
+                    {topics.length > 0 && (
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                            <Tags size={14} className="text-primary" />
+
+                            {topics.map((topic) => (
+                                <span
+                                    key={topic._id || topic.name}
+                                    className="badge badge-outline rounded-md px-2 py-2 text-[11px] font-medium"
+                                >
+                                    {topic.name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
 
                 </div>
 
@@ -180,7 +202,7 @@ const TestCard = ({
                         </p>
 
                         <h3 className="font-bold text-base">
-                            {duration} Hours
+                            {durationLabel}
                         </h3>
 
                     </div>

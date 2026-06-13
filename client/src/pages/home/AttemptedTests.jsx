@@ -58,6 +58,7 @@ const AttemptedTests = () => {
             const score = submission.questions.reduce(
               (total, question) =>
                 total +
+                (question.mcqMarks || 0) +
                 (question.codingMarks || 0) +
                 (question.timeComplexityMarks || 0) +
                 (question.spaceComplexityMarks || 0),
@@ -77,26 +78,21 @@ const AttemptedTests = () => {
               ? Math.floor((score / submission.test.fullMarks) * 100)
               : 0;
 
-            // Performance
-            let performance = "";
-
-            if (percentage < 20) performance = "Needs Improvement";
-            else if (percentage < 40) performance = "Below Average";
-            else if (percentage < 60) performance = "Average";
-            else if (percentage < 80) performance = "Good";
-            else performance = "Excellent";
-
             return (
               <AttemptedTestCard
                 key={submission._id}
                 submissionId={submission._id}
                 topicName={submission.test?.topicName}
+                topics={
+                  submission.test?.topics ||
+                  submission.test?.topicFolderIds ||
+                  []
+                }
                 scoredMarks={score}
                 fullMarks={submission.test?.fullMarks || 0}
                 percentage={percentage}
                 solvedQuestions={solvedQuestions}
                 totalQuestions={totalQuestions}
-                performance={performance}
                 status={submission.status}
                 evaluated={submission.isEvaluated}
                 finished={submission.isFinished}

@@ -7,6 +7,9 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
+import questionFolderRoutes from "./routes/questionFolder.route.js";
+import questionBankRoutes from "./routes/questionBank.route.js";
+import aiTestRoutes from "./routes/aiTest.route.js";
 
 dotenv.config();
 
@@ -29,6 +32,18 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
 app.use("/api/submissions", submissionRoutes);
+app.use(
+  "/api/question-folders",
+  questionFolderRoutes
+);
+app.use(
+  "/api/question-bank",
+  questionBankRoutes
+);
+app.use(
+  "/api/ai-test",
+  aiTestRoutes
+);
 
 app.get("/", (req, res) => {
     res.send("Backend Running 🚀");

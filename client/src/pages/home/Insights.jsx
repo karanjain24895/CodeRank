@@ -16,6 +16,7 @@ import {
   Percent,
   Sparkles,
   BookOpen,
+  Tags,
   X,
 } from "lucide-react";
 
@@ -191,6 +192,7 @@ const Insights = () => {
           const score = (item.questions || []).reduce(
             (total, question) =>
               total +
+              (question.mcqMarks || 0) +
               (question.codingMarks || 0) +
               (question.timeComplexityMarks || 0) +
               (question.spaceComplexityMarks || 0),
@@ -237,6 +239,10 @@ const Insights = () => {
   }
 
   const topicName = submission.test?.topicName || "Insights";
+  const topics =
+    submission.test?.topics ||
+    submission.test?.topicFolderIds ||
+    [];
   const insights = submission.questions || [];
   const fullMarks = submission.test?.fullMarks || 0;
 
@@ -244,6 +250,7 @@ const Insights = () => {
   const score = insights.reduce((total, question) => {
     return (
       total +
+      (question.mcqMarks || 0) +
       (question.codingMarks || 0) +
       (question.timeComplexityMarks || 0) +
       (question.spaceComplexityMarks || 0)
@@ -256,8 +263,8 @@ const Insights = () => {
     : 0;
 
   // Performance
-  let performance = "";
-  let performanceColor = "";
+  let performance;
+  let performanceColor;
 
   if (percentage < 30) {
     performance = "Needs Improvement";
@@ -301,6 +308,21 @@ const Insights = () => {
             <p className="text-base-content/60 mt-1 text-sm">
               Performance Overview
             </p>
+
+            {topics.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <Tags size={14} className="text-primary" />
+
+                {topics.map((topic) => (
+                  <span
+                    key={topic._id || topic.name}
+                    className="badge badge-outline rounded-md px-2 py-2 text-[11px] font-medium"
+                  >
+                    {topic.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <button
@@ -383,11 +405,19 @@ const Insights = () => {
             timeComplexityMarks={question.timeComplexityMarks}
             spaceComplexityMarks={question.spaceComplexityMarks}
             totalMarks={
-              (question.codingMarks || 0) +
+              question.questionType === "mcq"
+                ? 1
+                : (question.codingMarks || 0) +
               (question.timeComplexityMarks || 0) +
               (question.spaceComplexityMarks || 0)
             }
             remarks={question.remarks}
+            questionType={question.questionType}
+            options={question.options || []}
+            selectedOption={question.selectedOption}
+            correctOption={question.correctOption}
+            isCorrect={question.isCorrect}
+            mcqMarks={question.mcqMarks}
           />
         ))}
       </div>

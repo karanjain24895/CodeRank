@@ -6,6 +6,7 @@ import {
 
 import {
   Pencil,
+  Tags,
 } from "lucide-react";
 
 import axiosInstance from "../lib/axios";
@@ -14,6 +15,7 @@ const CreatedTestCard = ({
   testId,
   testNumber,
   topicName,
+  topics = [],
 }) => {
 
   const navigate =
@@ -45,6 +47,24 @@ const CreatedTestCard = ({
             <p className="text-base-content/60">
               Created Test
             </p>
+
+            {topics.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <Tags
+                  size={14}
+                  className="text-primary"
+                />
+
+                {topics.map((topic) => (
+                  <span
+                    key={topic._id || topic.name}
+                    className="badge badge-outline rounded-md px-2 py-2 text-[11px] font-medium"
+                  >
+                    {topic.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         {/* Buttons */}

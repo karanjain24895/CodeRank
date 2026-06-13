@@ -5,6 +5,8 @@ import {
     Database,
     Trophy,
     MessageSquareText,
+    CheckCircle2,
+    XCircle,
 } from "lucide-react";
 
 const InsightsCard = ({
@@ -16,7 +18,65 @@ const InsightsCard = ({
     spaceComplexityMarks,
     totalMarks,
     remarks,
+    questionType = "coding",
+    options = [],
+    selectedOption,
+    correctOption,
+    isCorrect,
+    mcqMarks,
 }) => {
+
+    if (questionType === "mcq") {
+        return (
+            <div className="w-full bg-base-100 border border-base-300 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                <div className="flex items-start gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                        {questionNumber}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <h2 className="text-lg sm:text-xl font-bold text-base-content">
+                            {questionName}
+                        </h2>
+                        <div
+                            className={`mt-2 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold ${
+                                isCorrect
+                                    ? "bg-success/10 text-success"
+                                    : "bg-error/10 text-error"
+                            }`}
+                        >
+                            {isCorrect ? (
+                                <CheckCircle2 size={16} />
+                            ) : (
+                                <XCircle size={16} />
+                            )}
+                            {mcqMarks || 0}/{totalMarks || 1}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid gap-2 mb-4">
+                    {options.map((option, index) => (
+                        <div
+                            key={index}
+                            className={`rounded-xl border px-4 py-3 flex gap-3 ${
+                                index === correctOption
+                                    ? "border-success bg-success/10"
+                                    : index === selectedOption
+                                    ? "border-error bg-error/10"
+                                    : "border-base-300 bg-base-200"
+                            }`}
+                        >
+                            <span className="font-bold">
+                                {String.fromCharCode(65 + index)}.
+                            </span>
+                            <span>{option}</span>
+                        </div>
+                    ))}
+                </div>
+
+            </div>
+        );
+    }
 
     return (
     <div className="w-full bg-base-100 border border-base-300 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">

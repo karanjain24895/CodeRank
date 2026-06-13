@@ -6,7 +6,7 @@ import {
   ClipboardList,
   LogOut,
   PlusCircle,
-  ListPlus,
+  BookOpen,
 } from "lucide-react";
 
 import {
@@ -56,11 +56,17 @@ const AdminNavbar = () => {
       end: true,
     },
     {
-    name: "Add Questions",
-    path: "/add-questions",
-    icon: ListPlus,
-    end: true,
-  },
+      name: "Question Bank",
+      icon: BookOpen,
+      path: "/question-bank",
+      end: true,
+    }
+    //   {
+    //   name: "Add Questions",
+    //   path: "/add-questions",
+    //   icon: ListPlus,
+    //   end: true,
+    // },
   ];
 
   return (
@@ -105,10 +111,9 @@ const AdminNavbar = () => {
                 className={({
                   isActive,
                 }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium ${
-                    isActive
-                      ? "bg-primary text-primary-content shadow-lg"
-                      : "hover:bg-base-300"
+                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium ${isActive
+                    ? "bg-primary text-primary-content shadow-lg"
+                    : "hover:bg-base-300"
                   }`
                 }
               >

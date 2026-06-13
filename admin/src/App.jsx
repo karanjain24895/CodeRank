@@ -14,7 +14,9 @@ import TestForm from "./pages/TestForm";
 import Submissions from "./pages/Submissions";
 import SubmissionEvaluation from "./pages/SubmissionEvaluation";
 import CreatedTests from "./pages/CreatedTests";
-import AddQuestions from "./pages/AddQuestions";
+import QuestionBank from "./pages/QuestionBank"
+import QuestionFolderDetails from "./pages/QuestionFolderDetails";
+// import AddQuestions from "./pages/AddQuestions";
 
 // Layout Wrapper
 const Layout = () => {
@@ -109,14 +111,22 @@ function App() {
               <SubmissionEvaluation />
             }
           />
+          <Route
+            path="/question-bank"
+            element={<QuestionBank />}
+          />
+
+          <Route
+            path="/question-bank/:folderId"
+            element={<QuestionFolderDetails />}
+          />
 
         </Route>
-        <Route
-          path="/add-questions"
-          element={<AddQuestions />}
-        />
+
+
 
       </Routes>
+
 
     </BrowserRouter>
   );

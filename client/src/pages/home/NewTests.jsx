@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TestCard from "../../components/TestCard";
 import axiosInstance from "../../lib/axios";
 
@@ -33,7 +33,7 @@ const NewTests = () => {
       // Sort by nearest start time
       filteredTests.sort(
   (a, b) =>
-    new Date(a.liveDateTime) - new Date(b.liveDateTime)
+    new Date(a.startDateTime) - new Date(b.startDateTime)
 );
 
       setTests(filteredTests);
@@ -80,9 +80,15 @@ const NewTests = () => {
               testId={test._id}
               testNumber={index + 1}
               topicName={test.topicName}
+              testType={test.testType}
               fullMarks={test.fullMarks}
               duration={test.duration}
-              questionsCount={test.questions.length}
+              topics={test.topics || []}
+              questionsCount={
+                test.questions?.length ||
+                test.questionRefs?.length ||
+                0
+              }
               liveDateTime={test.startDateTime}
             />
           ))

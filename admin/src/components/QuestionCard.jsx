@@ -5,7 +5,6 @@ import {
   Tags,
   Trophy,
   Trash2,
-  WandSparkles,
 } from "lucide-react";
 
 const QuestionCard = ({
