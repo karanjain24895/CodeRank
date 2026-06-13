@@ -132,7 +132,8 @@ const NewTests = () => {
             if (filterMode === "attempted" || isAttempted) {
               if (filterMode === "attempted" && !sub) return null;
 
-              const score = sub ? sub.questions.reduce(
+              const questions = sub?.questions || [];
+              const score = questions.reduce(
                 (t, q) =>
                   t +
                   (q.mcqMarks || 0) +
@@ -140,9 +141,9 @@ const NewTests = () => {
                   (q.timeComplexityMarks || 0) +
                   (q.spaceComplexityMarks || 0),
                 0
-              ) : 0;
-              const solvedQuestions = sub ? sub.questions.filter((q) => q.isSolved).length : 0;
-              const totalQuestions = sub ? sub.questions.length : 0;
+              );
+              const solvedQuestions = questions.filter((q) => q.isSolved).length;
+              const totalQuestions = questions.length;
 
               return (
                 <AttemptedTestCard

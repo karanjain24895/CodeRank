@@ -100,7 +100,8 @@ const AttemptedTests = () => {
       ) : paginated.length > 0 ? (
         <div className="space-y-4">
           {paginated.map((submission) => {
-            const score = submission.questions.reduce(
+            const questions = submission.questions || [];
+            const score = questions.reduce(
               (total, q) =>
                 total +
                 (q.mcqMarks || 0) +
@@ -109,8 +110,8 @@ const AttemptedTests = () => {
                 (q.spaceComplexityMarks || 0),
               0
             );
-            const solvedQuestions = submission.questions.filter((q) => q.isSolved).length;
-            const totalQuestions  = submission.questions.length;
+            const solvedQuestions = questions.filter((q) => q.isSolved).length;
+            const totalQuestions  = questions.length;
             const percentage      = submission.test?.fullMarks
               ? Math.floor((score / submission.test.fullMarks) * 100)
               : 0;
