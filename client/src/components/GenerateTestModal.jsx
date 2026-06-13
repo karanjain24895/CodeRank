@@ -31,6 +31,7 @@ const GenerateTestModal = ({ isOpen, onClose, mode = "coding" }) => {
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -41,6 +42,7 @@ const GenerateTestModal = ({ isOpen, onClose, mode = "coding" }) => {
     );
     setTopicFolderIds([]);
     setTopicSearch("");
+    setSearchFocused(false);
 
     if (mode === "mcq") {
       setFolders([]);
@@ -156,23 +158,24 @@ const GenerateTestModal = ({ isOpen, onClose, mode = "coding" }) => {
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[999] grid place-items-center bg-black/65 backdrop-blur-sm p-3">
+    <div className="fixed inset-0 z-[999] grid place-items-center bg-neutral-950/60 backdrop-blur-md p-3 transition-all duration-300">
       <form
         onSubmit={handleGenerate}
-        className="w-full max-w-xl max-h-[88dvh] bg-base-100 border border-base-300 rounded-xl shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-xl max-h-[90dvh] bg-base-100 border border-base-300/80 rounded-3xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
       >
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-base-300 bg-base-200/50">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-primary text-primary-content flex items-center justify-center shrink-0 shadow-sm">
-              <WandSparkles size={16} />
+        {/* Header */}
+        <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-base-300/60 bg-base-200/40">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary text-primary-content flex items-center justify-center shrink-0 shadow-md shadow-primary/20">
+              <WandSparkles size={18} />
             </div>
             <div className="min-w-0">
-              <h2 className="text-lg font-extrabold truncate">
+              <h2 className="text-xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 {isCodingTest
                   ? "Generate Coding Test"
                   : "Generate MCQ Test"}
               </h2>
-              <p className="text-xs text-base-content/60">
+              <p className="text-xs text-base-content/60 font-medium mt-0.5">
                 {isCodingTest
                   ? "Choose question-bank topics for a coding test"
                   : "Choose a subject and let AI create MCQs"}
@@ -183,163 +186,181 @@ const GenerateTestModal = ({ isOpen, onClose, mode = "coding" }) => {
           <button
             type="button"
             onClick={resetAndClose}
-            className="btn btn-ghost btn-xs btn-square"
+            className="btn btn-ghost btn-sm btn-circle hover:bg-base-300/50 hover:scale-105 active:scale-95 transition-all"
             disabled={generating}
           >
-            <X size={15} />
+            <X size={16} />
           </button>
         </div>
 
-        <div className="p-4 space-y-4 overflow-y-auto">
+        {/* Content */}
+        <div className="p-6 space-y-5 overflow-y-auto">
           {error && (
-            <div className="alert alert-error py-1.5 text-xs">
+            <div className="alert alert-error py-2.5 px-4 rounded-xl text-xs font-semibold shadow-sm">
               {error}
             </div>
           )}
 
+          {/* Test Name */}
           <label className="block">
-            <span className="font-bold text-sm block mb-1.5">
+            <span className="font-bold text-sm text-base-content/90 block mb-1.5">
               Test Name
             </span>
             <input
               type="text"
               value={testName}
               onChange={(e) => setTestName(e.target.value)}
-              className="input input-bordered input-sm w-full rounded-lg text-sm"
-              placeholder="Example: Backend Interview Practice"
+              className="input input-bordered input-md w-full rounded-xl text-sm border-base-300 bg-base-100/50 focus:bg-base-100 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200"
+              placeholder="Enter Test Name"
               disabled={generating}
             />
           </label>
 
+          {/* MCQ Topics List */}
           {isMcqTest && (
-          <div>
-            <span className="font-bold text-sm block mb-1.5">
-              MCQ Topic
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-              {MCQ_SUBJECTS.map((subject) => (
-                <button
-                  key={subject}
-                  type="button"
-                  onClick={() => {
-                    setSelectedSubject(subject);
-                    setError("");
-                  }}
-                  disabled={generating}
-                  className={`btn btn-sm rounded-lg text-xs h-auto min-h-9 whitespace-normal leading-tight ${
-                    selectedSubject === subject
-                      ? "btn-primary"
-                      : "btn-outline bg-base-100"
-                  }`}
-                >
-                  {subject}
-                </button>
-              ))}
+            <div>
+              <span className="font-bold text-sm text-base-content/90 block mb-2">
+                MCQ Topic
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {MCQ_SUBJECTS.map((subject) => (
+                  <button
+                    key={subject}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSubject(subject);
+                      setError("");
+                    }}
+                    disabled={generating}
+                    className={`w-full px-4 py-3 rounded-xl border text-left text-xs font-semibold transition-all duration-200 flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] ${
+                      selectedSubject === subject
+                        ? "border-primary bg-primary/10 text-primary shadow-sm shadow-primary/5"
+                        : "border-base-300/80 bg-base-200/30 hover:bg-base-200/70 hover:border-base-content/10 text-base-content/85"
+                    }`}
+                  >
+                    <span>{subject}</span>
+                    {selectedSubject === subject && (
+                      <span className="w-2 h-2 rounded-full bg-primary shrink-0 ml-2 animate-ping" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
           )}
 
+          {/* Coding Topics List */}
           {isCodingTest && (
-          <div>
-            <div className="flex items-center justify-between gap-3 mb-1.5">
-              <span className="font-bold text-sm">
-                Coding Topics
-              </span>
-              <span className="text-xs text-base-content/60">
-                {topicFolderIds.length}/5 selected
-              </span>
-            </div>
+            <div className="relative">
+              <div className="flex items-center justify-between gap-3 mb-1.5">
+                <span className="font-bold text-sm text-base-content/90">
+                  Coding Topics
+                </span>
+                <span className="text-xs text-base-content/50 font-medium">
+                  {topicFolderIds.length}/5 selected
+                </span>
+              </div>
 
-            <div className="border border-base-300 rounded-lg bg-base-100 focus-within:border-primary transition">
-              <div className="min-h-9 px-2 py-1.5 flex flex-wrap items-center gap-1.5">
-                {selectedTopics.map((folder) => (
-                  <span
-                    key={folder._id}
-                    className="badge badge-primary gap-1.5 px-2 py-2.5 rounded-md max-w-full text-[11px]"
-                  >
-                    <span className="truncate max-w-36">
-                      {folder.name}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeTopic(folder._id)}
-                      className="grid place-items-center"
-                      disabled={generating}
-                      aria-label={`Remove ${folder.name}`}
+              <div className="border border-base-300 bg-base-100/50 rounded-2xl focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-200">
+                <div className="min-h-12 px-3 py-2 flex flex-wrap items-center gap-1.5">
+                  {selectedTopics.map((folder) => (
+                    <span
+                      key={folder._id}
+                      className="flex items-center gap-1.5 pl-3 pr-2 py-1 bg-base-200 border border-base-300/80 rounded-full text-xs font-semibold text-base-content/85 shadow-sm hover:bg-base-300/40 transition-colors"
                     >
-                      <X size={11} />
-                    </button>
-                  </span>
-                ))}
+                      <span className="truncate max-w-36">
+                        {folder.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeTopic(folder._id)}
+                        className="w-4 h-4 rounded-full bg-base-content/10 hover:bg-base-content/20 text-base-content flex items-center justify-center shrink-0 transition"
+                        disabled={generating}
+                        aria-label={`Remove ${folder.name}`}
+                      >
+                        <X size={10} />
+                      </button>
+                    </span>
+                  ))}
 
-                <div className="flex items-center gap-1.5 flex-1 min-w-40">
-                  <Search
-                    size={13}
-                    className="text-base-content/40 shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={topicSearch}
-                    onChange={(e) =>
-                      setTopicSearch(e.target.value)
-                    }
-                    className="w-full min-w-0 bg-transparent outline-none text-xs py-1"
-                    placeholder={
-                      selectedTopics.length
-                        ? "Search more topics"
-                        : "Search and select topics"
-                    }
-                    disabled={generating || loadingTopics}
-                  />
+                  <div className="flex items-center gap-2 flex-1 min-w-40">
+                    <Search
+                      size={14}
+                      className="text-base-content/40 shrink-0"
+                    />
+                    <input
+                      type="text"
+                      value={topicSearch}
+                      onChange={(e) =>
+                        setTopicSearch(e.target.value)
+                      }
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => setSearchFocused(false)}
+                      className="w-full min-w-0 bg-transparent outline-none text-xs py-1"
+                      placeholder={
+                        selectedTopics.length
+                          ? "Search more topics"
+                          : "Search and select topics"
+                      }
+                      disabled={generating || loadingTopics}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {loadingTopics ? (
-              <div className="mt-1.5 h-16 flex items-center justify-center bg-base-200 rounded-lg">
-                <span className="loading loading-spinner loading-sm" />
-              </div>
-            ) : (
-              <div className="mt-1.5 max-h-56 overflow-y-auto rounded-lg border border-base-300 bg-base-200/70 p-1">
-                {availableTopics.length ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
-                    {availableTopics.map((folder) => (
-                      <button
-                        key={folder._id}
-                        type="button"
-                        onClick={() => addTopic(folder._id)}
-                        disabled={generating}
-                        className="h-6 px-1.5 rounded border border-base-300 bg-base-100 text-left text-[11px] leading-none font-medium hover:border-primary hover:text-primary transition truncate"
-                      >
-                        {folder.name}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="h-12 grid place-items-center text-xs text-base-content/60">
-                    No matching topics
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+              {/* Material Dropdown Suggestions Menu */}
+              {searchFocused && (
+                <div 
+                  className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-2xl border border-base-300 bg-base-100 p-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150"
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  {loadingTopics ? (
+                    <div className="py-6 flex items-center justify-center">
+                      <span className="loading loading-spinner loading-md text-primary" />
+                    </div>
+                  ) : availableTopics.length ? (
+                    <div className="flex flex-col gap-0.5">
+                      {availableTopics.map((folder) => (
+                        <button
+                          key={folder._id}
+                          type="button"
+                          onClick={() => {
+                            addTopic(folder._id);
+                            setTopicSearch("");
+                          }}
+                          disabled={generating}
+                          className="w-full px-4 py-2 rounded-xl text-left text-xs font-semibold text-base-content/85 hover:bg-primary/10 hover:text-primary transition-all duration-150 flex items-center gap-2"
+                        >
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                          {folder.name}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-6 text-center text-xs text-base-content/50 font-medium">
+                      No matching topics
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )}
 
+          {/* Question Count */}
           <div>
-            <span className="font-bold text-sm block mb-1.5">
+            <span className="font-bold text-sm text-base-content/90 block mb-2">
               Number of Questions
             </span>
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-3 gap-2">
               {questionCounts.map((count) => (
                 <button
                   key={count}
                   type="button"
                   onClick={() => setQuestionCount(count)}
                   disabled={generating}
-                  className={`btn btn-sm rounded-lg text-xs ${
+                  className={`btn btn-md rounded-xl text-xs font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
                     questionCount === count
-                      ? "btn-primary"
-                      : "btn-outline bg-base-100"
+                      ? "btn-primary bg-gradient-to-r from-primary to-secondary border-none text-primary-content shadow-md shadow-primary/15"
+                      : "btn-outline border-base-300 bg-base-100 hover:border-primary hover:bg-primary/5 hover:text-primary"
                   }`}
                 >
                   {count} Questions
@@ -347,35 +368,36 @@ const GenerateTestModal = ({ isOpen, onClose, mode = "coding" }) => {
               ))}
             </div>
             {isMcqTest && (
-              <p className="text-xs text-base-content/60 mt-1.5">
+              <p className="text-xs text-base-content/60 mt-2 font-medium">
                 Duration: {questionCount} minutes
               </p>
             )}
           </div>
         </div>
 
-        <div className="px-4 py-3 border-t border-base-300 bg-base-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-1.5">
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-base-300/60 bg-base-200/40 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <button
             type="button"
             onClick={resetAndClose}
-            className="btn btn-ghost btn-sm rounded-lg"
+            className="btn btn-ghost btn-md rounded-xl text-xs font-semibold hover:bg-base-300/50"
             disabled={generating}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="btn btn-primary btn-sm rounded-lg min-w-32"
+            className="btn btn-primary btn-md rounded-xl text-xs font-black bg-gradient-to-r from-primary to-secondary border-none text-primary-content shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all min-w-36"
             disabled={generating || loadingTopics}
           >
             {generating ? (
               <>
-                <Loader2 size={13} className="animate-spin" />
+                <Loader2 size={14} className="animate-spin" />
                 Generating
               </>
             ) : (
               <>
-                <Sparkles size={13} />
+                <Sparkles size={14} />
                 Generate
               </>
             )}

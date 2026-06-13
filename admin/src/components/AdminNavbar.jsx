@@ -1,148 +1,172 @@
-import React from "react";
-
+import React, { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   FileCode,
   ClipboardList,
-  LogOut,
   PlusCircle,
   BookOpen,
+  Sun,
+  Moon,
+  ChevronRight,
+  Shield,
 } from "lucide-react";
 
-import {
-  NavLink,
-  useNavigate,
-} from "react-router-dom";
-
 const AdminNavbar = () => {
+  const [theme, setTheme] = useState(() => {
+    // Default is always "light" for new visitors.
+    // Only honour an explicitly saved user preference.
+    const saved = localStorage.getItem("admin-theme");
+    return saved === "dark" || saved === "light" ? saved : "light";
+  });
 
-  const navigate =
-    useNavigate();
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("admin-theme", theme);
+  }, [theme]);
 
-  const handleLogout =
-    () => {
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
-      localStorage.clear();
-
-      navigate("/login");
-    };
-
-  const navItems = [
+  const navSections = [
     {
-      name: "Dashboard",
-      path: "/",
-      icon: LayoutDashboard,
-      end: true,
-    },
-
-    {
-      name: "New Submissions",
-      path: "/submissions",
-      icon: ClipboardList,
-      end: true,
-    },
-
-    {
-      name: "Submission History",
-      path: "/submissions/history",
-      icon: FileCode,
-      end: true,
-    },
-
-    {
-      name: "Create Test",
-      path: "/create-test",
-      icon: PlusCircle,
-      end: true,
+      label: "Overview",
+      items: [
+        {
+          name: "Dashboard",
+          path: "/",
+          icon: LayoutDashboard,
+          end: true,
+        },
+      ],
     },
     {
-      name: "Question Bank",
-      icon: BookOpen,
-      path: "/question-bank",
-      end: true,
-    }
-    //   {
-    //   name: "Add Questions",
-    //   path: "/add-questions",
-    //   icon: ListPlus,
-    //   end: true,
-    // },
+      label: "Submissions",
+      items: [
+        {
+          name: "New Submissions",
+          path: "/submissions",
+          icon: ClipboardList,
+          end: true,
+        },
+        {
+          name: "History",
+          path: "/submissions/history",
+          icon: FileCode,
+          end: true,
+        },
+      ],
+    },
+    {
+      label: "Tests",
+      items: [
+        {
+          name: "Created Tests",
+          path: "/created-tests",
+          icon: LayoutDashboard,
+          end: true,
+        },
+        {
+          name: "Create Test",
+          path: "/create-test",
+          icon: PlusCircle,
+          end: true,
+        },
+        {
+          name: "Question Bank",
+          icon: BookOpen,
+          path: "/question-bank",
+          end: true,
+        },
+      ],
+    },
   ];
 
   return (
+    <div className="w-64 h-screen sticky top-0 bg-base-200 border-r border-base-300 flex flex-col shadow-sm">
 
-    <div className="w-72 h-screen sticky top-0 bg-base-200 border-r border-base-300 flex flex-col justify-between shadow-xl">
-
-      <div>
-
-        {/* Logo */}
-        <div className="p-6 border-b border-base-300">
-
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-
-            CodeRank Admin
-
-          </h1>
-
-          <p className="text-sm text-base-content/60 mt-1">
-
-            Manage coding evaluations
-
-          </p>
-        </div>
-
-        {/* Nav Links */}
-        <div className="p-4 space-y-3">
-
-          {navItems.map((item) => {
-
-            const Icon =
-              item.icon;
-
-            return (
-
-              <NavLink
-                key={item.path}
-
-                to={item.path}
-
-                end={item.end}
-
-                className={({
-                  isActive,
-                }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium ${isActive
-                    ? "bg-primary text-primary-content shadow-lg"
-                    : "hover:bg-base-300"
-                  }`
-                }
-              >
-
-                <Icon size={20} />
-
-                <span>
-                  {item.name}
-                </span>
-
-              </NavLink>
-            );
-          })}
+      {/* Logo / Brand */}
+      <div className="px-5 py-6 border-b border-base-300">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
+            <Shield size={18} className="text-primary-content" />
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-base-content leading-tight">
+              CodeRank
+            </h1>
+            <p className="text-[11px] text-base-content/50 font-medium tracking-wide uppercase">
+              Admin Panel
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-base-300">
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+        {navSections.map((section) => (
+          <div key={section.label}>
+            <p className="text-[10px] font-bold text-base-content/40 uppercase tracking-widest px-3 mb-1.5">
+              {section.label}
+            </p>
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    end={item.end}
+                    className={({ isActive }) =>
+                      `group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm ${
+                        isActive
+                          ? "bg-primary/10 text-primary"
+                          : "text-base-content/70 hover:bg-base-300/60 hover:text-base-content"
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <div
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                            isActive
+                              ? "bg-primary text-primary-content shadow-sm"
+                              : "bg-base-300/60 text-base-content/60 group-hover:bg-base-300"
+                          }`}
+                        >
+                          <Icon size={16} />
+                        </div>
+                        <span className="flex-1">{item.name}</span>
+                        {isActive && (
+                          <ChevronRight size={14} className="text-primary" />
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
 
+      {/* Footer */}
+      <div className="px-3 py-4 border-t border-base-300">
+        {/* Theme Toggle */}
         <button
-          onClick={handleLogout}
-
-          className="btn btn-error w-full text-white"
+          onClick={toggleTheme}
+          type="button"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-base-content/70 hover:bg-base-300/60 hover:text-base-content transition-all duration-200"
         >
-
-          <LogOut size={18} />
-
-          Logout
-
+          <div className="w-8 h-8 rounded-lg bg-base-300/60 flex items-center justify-center">
+            {theme === "dark" ? (
+              <Sun size={16} className="text-warning" />
+            ) : (
+              <Moon size={16} className="text-primary" />
+            )}
+          </div>
+          <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
         </button>
       </div>
     </div>

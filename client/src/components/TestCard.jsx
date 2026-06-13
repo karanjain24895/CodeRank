@@ -7,6 +7,8 @@ import {
     CalendarDays,
     BookOpen,
     Tags,
+    Sparkles,
+    User,
 } from "lucide-react";
 
 const TestCard = ({
@@ -18,6 +20,7 @@ const TestCard = ({
     topics = [],
     questionsCount,
     liveDateTime,
+    sourceType = "manual",
 }) => {
 
     const [countdown, setCountdown] = useState("");
@@ -100,9 +103,20 @@ const TestCard = ({
                 {/* Topic */}
                 <div>
 
-                    <h2 className="text-xl sm:text-2xl font-bold text-base-content">
-                        {topicName}
-                    </h2>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                        <h2 className="text-xl sm:text-2xl font-bold text-base-content">
+                            {topicName}
+                        </h2>
+                        {sourceType === "ai" ? (
+                            <span className="badge badge-primary gap-1 font-semibold text-[10px] sm:text-xs py-2 px-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-none shadow-sm select-none">
+                                <Sparkles size={11} className="shrink-0 text-violet-200" /> AI
+                            </span>
+                        ) : (
+                            <span className="badge badge-neutral gap-1 font-semibold text-[10px] sm:text-xs py-2 px-2.5 bg-base-200 text-base-content/80 border-none shadow-sm select-none">
+                                <User size={11} className="shrink-0 text-base-content/50" /> Admin
+                            </span>
+                        )}
+                    </div>
 
                     {topics.length > 0 && (
                         <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -165,7 +179,7 @@ const TestCard = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
 
                 {/* Full Marks */}
-                <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="bg-base-200 border border-base-300 rounded-xl p-3 flex items-center gap-3">
 
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
 
@@ -187,7 +201,7 @@ const TestCard = ({
                 </div>
 
                 {/* Duration */}
-                <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="bg-base-200 border border-base-300 rounded-xl p-3 flex items-center gap-3">
 
                     <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
 
@@ -209,7 +223,7 @@ const TestCard = ({
                 </div>
 
                 {/* Questions */}
-                <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="bg-base-200 border border-base-300 rounded-xl p-3 flex items-center gap-3">
 
                     <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
 
@@ -231,7 +245,7 @@ const TestCard = ({
                 </div>
 
                 {/* Live Time */}
-                <div className="bg-base-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="bg-base-200 border border-base-300 rounded-xl p-3 flex items-center gap-3">
 
                     <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-success">
 

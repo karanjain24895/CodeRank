@@ -1,813 +1,298 @@
-// import React, {
-//   useEffect,
-//   useState,
-// } from "react";
-
-// import {
-//   useParams,
-// } from "react-router-dom";
-
-// import axiosInstance from "../lib/axios";
-
-// import SubmissionEvaluationCard from "../components/SubmissionEvaluationCard";
-
-// const SubmissionEvaluation = () => {
-
-//   const { submissionId } =
-//     useParams();
-
-//   const [loading, setLoading] =
-//     useState(true);
-
-//   const [submitting, setSubmitting] =
-//     useState(false);
-
-//   const [evaluated, setEvaluated] =
-//     useState(false);
-
-//   const [topicName, setTopicName] =
-//     useState("");
-
-//   const [username, setUsername] =
-//     useState("");
-
-//   const [questions, setQuestions] =
-//     useState([]);
-
-//   // Fetch Submission
-//   useEffect(() => {
-
-//     const fetchSubmission =
-//       async () => {
-
-//         try {
-
-//           const res =
-//             await axiosInstance.get(
-//               `/submissions/${submissionId}`,
-//               {
-//             headers: {
-//               "x-admin-key":
-//                 "mysecretadminkey",
-//             },
-//           }
-//             );
-
-//           const submission =
-//             res.data;
-
-//           setTopicName(
-//             submission.test.topicName
-//           );
-
-//           setUsername(
-//             submission.user.username
-//           );
-
-//           setQuestions(
-//             submission.questions
-//           );
-
-//           setEvaluated(
-//   submission.isEvaluated || false
-// );
-
-//         } catch (error) {
-
-//           console.log(error);
-
-//         } finally {
-
-//           setLoading(false);
-//         }
-//       };
-
-//     fetchSubmission();
-
-//   }, [submissionId]);
-
-//   // Update Inputs
-//   const handleChange = (
-//     index,
-//     field,
-//     value
-//   ) => {
-
-//     setQuestions((prev) =>
-//       prev.map((q, i) => {
-
-//         if (i !== index) {
-//           return q;
-//         }
-
-//         return {
-//           ...q,
-
-//           [field]:
-
-//             field === "isSolved"
-
-//               ? value
-
-//               : field === "remarks"
-
-//                 ? value
-
-//                 : Number(value),
-//         };
-//       })
-//     );
-//   };
-
-//   // Update Question
-//   const handleUpdate =
-//     async (
-//       index,
-//       question
-//     ) => {
-
-//       try {
-
-//         await axiosInstance.patch(
-//   `/submissions/evaluate/${submissionId}/${index}`,
-
-//   {
-//     codingMarks:
-//       question.codingMarks,
-
-//     timeComplexityMarks:
-//       question.timeComplexityMarks,
-
-//     spaceComplexityMarks:
-//       question.spaceComplexityMarks,
-
-//     remarks:
-//       question.remarks,
-
-//     isSolved:
-//       question.isSolved,
-//   },
-
-//   {
-//     headers: {
-//       "x-admin-key":
-//         "mysecretadminkey",
-//     },
-//   }
-// );
-
-//         alert(
-//           "Evaluation Updated"
-//         );
-
-//       } catch (error) {
-
-//         console.log(error);
-//       }
-//     };
-
-//   // Mark Entire Submission Evaluated
-//   const handleEvaluationToggle =
-//   async (checked) => {
-
-//     try {
-
-//       // update UI immediately
-//       setEvaluated(checked);
-
-//       await axiosInstance.patch(
-//         `/submissions/${submissionId}/status`,
-//         {
-//           isEvaluated: checked,
-//         },
-//         {
-//             headers: {
-//               "x-admin-key":
-//                 "mysecretadminkey",
-//             },
-//           }
-//       );
-
-//     } catch (error) {
-
-//       console.log(error);
-//     }
-// };
-//   // const handleCompleteEvaluation =
-//   //   async (
-//   //     checked
-//   //   ) => {
-
-//   //     if (!checked) return;
-
-//   //     try {
-
-//   //       setSubmitting(true);
-
-//   //       // await axiosInstance.patch(
-//   //       //   `/submissions/${submissionId}/status`,
-//   //       //   {
-//   //       //     status: "evaluated",
-//   //       //     evaluated: true,
-//   //       //   }
-//   //       // );
-
-//   //       await axiosInstance.patch(
-//   //         `/submissions/${submissionId}/status`,
-//   //         {
-//   //           isEvaluated: checked,
-//   //         }
-//   //       );
-
-//   //       setEvaluated(true);
-
-//   //       alert(
-//   //         "Submission marked as evaluated"
-//   //       );
-
-//   //     } catch (error) {
-
-//   //       console.log(error);
-
-//   //     } finally {
-
-//   //       setSubmitting(false);
-//   //     }
-//   //   };
-
-//   // View Question
-//   const handleView = (
-//     question
-//   ) => {
-
-//     window.open(
-//       question.questionLink,
-//       "_blank"
-//     );
-//   };
-
-//   if (loading) {
-
-//     return (
-//       <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
-//         Loading...
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-6">
-
-//       {/* Header */}
-//       <div className="mb-10">
-
-//         <h1 className="text-5xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-//           Submission Evaluation
-//         </h1>
-
-//         <p className="text-base-content/70 mt-3 text-lg">
-//           Review and evaluate student submissions 🚀
-//         </p>
-//       </div>
-
-//       {/* Submission Info */}
-//       <div className="bg-base-100 border border-base-300 rounded-3xl p-8 shadow-md mb-8">
-
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-//           {/* Topic Name */}
-//           <div className="bg-base-200 rounded-2xl p-5">
-
-//             <p className="text-sm text-base-content/60 mb-2">
-//               Topic Name
-//             </p>
-
-//             <h2 className="text-3xl font-bold">
-//               {topicName}
-//             </h2>
-//           </div>
-
-//           {/* Username */}
-//           <div className="bg-base-200 rounded-2xl p-5">
-
-//             <p className="text-sm text-base-content/60 mb-2">
-//               Username
-//             </p>
-
-//             <h2 className="text-3xl font-bold">
-//               {username}
-//             </h2>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Question Evaluations */}
-//       <div className="space-y-6">
-
-//         {questions.map(
-//           (
-//             question,
-//             index
-//           ) => (
-
-//             <SubmissionEvaluationCard
-//               key={index}
-
-//               questionNumber={
-//                 index + 1
-//               }
-
-//               questionName={
-//                 question.questionName
-//               }
-
-//               codingMarks={
-//                 question.codingMarks
-//               }
-
-//               timeComplexityMarks={
-//                 question.timeComplexityMarks
-//               }
-
-//               spaceComplexityMarks={
-//                 question.spaceComplexityMarks
-//               }
-
-//               remarks={
-//                 question.remarks
-//               }
-
-//               isSolved={
-//                 question.isSolved || false
-//               }
-
-//               onChange={(
-//                 field,
-//                 value
-//               ) =>
-//                 handleChange(
-//                   index,
-//                   field,
-//                   value
-//                 )
-//               }
-
-//               onUpdate={() =>
-//                 handleUpdate(
-//                   index,
-//                   question
-//                 )
-//               }
-
-//               onView={() =>
-//                 handleView(
-//                   question
-//                 )
-//               }
-//             />
-//           )
-//         )}
-//       </div>
-
-//       {/* Final Evaluation Checkbox */}
-//       <div className="mt-10 bg-base-100 border border-base-300 rounded-3xl p-6 shadow-md">
-
-//         <label className="flex items-center gap-4 cursor-pointer">
-
-//           <input
-//             type="checkbox"
-
-//             className="checkbox checkbox-success checkbox-lg"
-
-//             checked={evaluated}
-
-//             // disabled={
-//             //   evaluated ||
-//             //   submitting
-//             // }
-
-//             onChange={(e) =>
-//               handleEvaluationToggle(
-//                 e.target.checked
-//               )
-//             }
-//           />
-
-//           <div>
-
-//             <h2 className="text-xl font-bold">
-
-//               {
-//                 evaluated
-
-//                   ? "Submission Evaluated"
-
-//                   : "Mark Submission As Evaluated"
-//               }
-
-//             </h2>
-
-//             <p className="text-base-content/60">
-
-//               {
-//                 evaluated
-
-//                   ? "Evaluation has been completed"
-
-//                   : "Set as mark to make evaluation complete"
-//               }
-
-//             </p>
-//           </div>
-//         </label>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SubmissionEvaluation;
-
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
-import {
-  useParams,
-} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { CheckSquare, Square, RefreshCw, ClipboardList, User, BookOpen, ListChecks } from "lucide-react";
 
 import axiosInstance from "../lib/axios";
-
 import SubmissionEvaluationCard from "../components/SubmissionEvaluationCard";
+import McqSubmissionEvaluationCard from "../components/McqSubmissionEvaluationCard";
+
+const ADMIN_KEY = "mysecretadminkey";
 
 const SubmissionEvaluation = () => {
+  const { submissionId } = useParams();
 
-  const { submissionId } =
-    useParams();
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [evaluated, setEvaluated] = useState(false);
+  const [topicName, setTopicName] = useState("");
+  const [username, setUsername] = useState("");
+  const [testType, setTestType] = useState("coding");
+  const [questions, setQuestions] = useState([]);
+  const [toast, setToast] = useState(null); // { type: "success"|"error", msg }
 
-  const [loading, setLoading] =
-    useState(true);
+  const showToast = (type, msg) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 3500);
+  };
 
-  const [submitting, setSubmitting] =
-    useState(false);
-
-  const [evaluated, setEvaluated] =
-    useState(false);
-
-  const [topicName, setTopicName] =
-    useState("");
-
-  const [username, setUsername] =
-    useState("");
-
-  const [questions, setQuestions] =
-    useState([]);
-
-  // Fetch Submission
+  // ─── Fetch Submission ─────────────────────────────────────────────────────
   useEffect(() => {
+    const fetchSubmission = async () => {
+      try {
+        const res = await axiosInstance.get(`/submissions/${submissionId}`, {
+          headers: { "x-admin-key": ADMIN_KEY },
+        });
 
-    const fetchSubmission =
-      async () => {
-
-        try {
-
-          const res =
-            await axiosInstance.get(
-              `/submissions/${submissionId}`,
-              {
-                headers: {
-                  "x-admin-key":
-                    "mysecretadminkey",
-                },
-              }
-            );
-
-          const submission =
-            res.data;
-
-          setTopicName(
-            submission.test.topicName
-          );
-
-          setUsername(
-            submission.user.username
-          );
-
-          setQuestions(
-            submission.questions
-          );
-
-          setEvaluated(
-            submission.isEvaluated || false
-          );
-
-        } catch (error) {
-
-          console.log(error);
-
-        } finally {
-
-          setLoading(false);
-        }
-      };
+        const submission = res.data;
+        setTopicName(submission.test?.topicName || "Unknown Test");
+        setUsername(submission.user?.username || "Unknown User");
+        setTestType(submission.test?.testType || "coding");
+        setQuestions(submission.questions || []);
+        setEvaluated(submission.isEvaluated || false);
+      } catch (error) {
+        console.error("Fetch submission error:", error);
+        showToast("error", "Failed to load submission.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchSubmission();
-
   }, [submissionId]);
 
-  // Input Change
-  const handleChange = (
-    index,
-    field,
-    value
-  ) => {
-
+  // ─── Handle local question field change ──────────────────────────────────
+  const handleChange = (index, field, value) => {
     setQuestions((prev) =>
       prev.map((q, i) => {
-
-        if (i !== index) {
-          return q;
-        }
-
+        if (i !== index) return q;
         return {
           ...q,
-
           [field]:
-
             field === "isSolved"
-
               ? value
-
-              : field === "remarks"
-
-                ? value
-
-                : value === ""
-
-                  ? ""
-
-                  : Number(value),
+              : field === "remarks" || field === "correctOption"
+              ? value
+              : value === ""
+              ? ""
+              : Number(value),
         };
       })
     );
   };
 
-  // Update Entire Submission
-  const handleUpdateAll =
-    async () => {
+  // ─── Save all evaluations + status ───────────────────────────────────────
+  const handleUpdateAll = async () => {
+    try {
+      setSubmitting(true);
 
-      try {
+      for (let index = 0; index < questions.length; index++) {
+        const question = questions[index];
 
-        setSubmitting(true);
+        const payload =
+          question.questionType === "mcq"
+            ? { correctOption: question.correctOption }
+            : {
+                codingMarks: question.codingMarks || 0,
+                timeComplexityMarks: question.timeComplexityMarks || 0,
+                spaceComplexityMarks: question.spaceComplexityMarks || 0,
+                remarks: question.remarks || "",
+                isSolved: question.isSolved,
+              };
 
-        // Update every question
-        for (
-          let index = 0;
-          index < questions.length;
-          index++
-        ) {
-
-          const question =
-            questions[index];
-
-          await axiosInstance.patch(
-            `/submissions/evaluate/${submissionId}/${index}`,
-
-            {
-              codingMarks:
-                question.codingMarks || 0,
-
-              timeComplexityMarks:
-                question.timeComplexityMarks || 0,
-
-              spaceComplexityMarks:
-                question.spaceComplexityMarks || 0,
-
-              remarks:
-                question.remarks,
-
-              isSolved:
-                question.isSolved,
-            },
-
-            {
-              headers: {
-                "x-admin-key":
-                  "mysecretadminkey",
-              },
-            }
-          );
-        }
-
-        // Update evaluation status only after all questions updated
         await axiosInstance.patch(
-          `/submissions/${submissionId}/status`,
-          {
-            isEvaluated:
-              evaluated,
-          },
-          {
-            headers: {
-              "x-admin-key":
-                "mysecretadminkey",
-            },
-          }
+          `/submissions/evaluate/${submissionId}/${index}`,
+          payload,
+          { headers: { "x-admin-key": ADMIN_KEY } }
         );
-
-        alert(
-          "Submission Updated Successfully"
-        );
-
-      } catch (error) {
-
-        console.log(error);
-
-      } finally {
-
-        setSubmitting(false);
       }
-    };
 
-  // View Question
-  const handleView = (
-    question
-  ) => {
+      // Mark evaluation status
+      await axiosInstance.patch(
+        `/submissions/${submissionId}/status`,
+        { isEvaluated: evaluated },
+        { headers: { "x-admin-key": ADMIN_KEY } }
+      );
 
-    window.open(
-      question.questionLink,
-      "_blank"
-    );
+      showToast("success", "Submission updated successfully!");
+    } catch (error) {
+      console.error("Update all error:", error);
+      showToast("error", error.response?.data?.message || "Failed to update submission.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) {
+  const handleView = (question) => {
+    if (question.questionLink) window.open(question.questionLink, "_blank");
+  };
 
+  // ─── Loading State ────────────────────────────────────────────────────────
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
-        Loading...
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+        <p className="text-base-content/60 font-medium">Loading submission…</p>
       </div>
     );
   }
 
+  const isMcq = testType === "mcq";
+  const correctCount = questions.filter((q) => q.isCorrect).length;
+  const totalScore = questions.reduce(
+    (sum, q) =>
+      sum +
+      (q.mcqMarks || 0) +
+      (q.codingMarks || 0) +
+      (q.timeComplexityMarks || 0) +
+      (q.spaceComplexityMarks || 0),
+    0
+  );
+
   return (
+    <div className="min-h-screen bg-base-100 p-6">
 
-    <div className="min-h-screen bg-gradient-to-br from-base-300 via-base-200 to-base-100 p-6">
+      {/* ── Toast ──────────────────────────────────────────────────────────── */}
+      {toast && (
+        <div className={`toast toast-top toast-end z-50`}>
+          <div className={`alert ${toast.type === "success" ? "alert-success" : "alert-error"} shadow-lg`}>
+            <span className="font-semibold">{toast.msg}</span>
+          </div>
+        </div>
+      )}
 
-      {/* Header */}
-      <div className="mb-10">
-
-        <h1 className="text-5xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-
+      {/* ── Page Header ────────────────────────────────────────────────────── */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2.5 mb-1">
+          <div className={`badge badge-lg font-bold uppercase text-xs tracking-wider ${isMcq ? "badge-secondary" : "badge-primary"}`}>
+            {isMcq ? "MCQ Test" : "Coding Test"}
+          </div>
+          {evaluated && (
+            <div className="badge badge-success badge-lg font-bold text-xs uppercase tracking-wider">
+              ✓ Evaluated
+            </div>
+          )}
+        </div>
+        <h1 className="text-3xl font-bold text-base-content mt-2">
           Submission Evaluation
-
         </h1>
-
-        <p className="text-base-content/70 mt-3 text-lg">
-
-          Review and evaluate student submissions 🚀
-
+        <p className="text-base-content/60 mt-1 text-sm">
+          {isMcq
+            ? "Review MCQ answers, verify correct options, and save evaluation."
+            : "Review coding solutions and assign marks to each question."}
         </p>
       </div>
 
-      {/* Submission Info */}
-      <div className="bg-base-100 border border-base-300 rounded-3xl p-8 shadow-md mb-8">
+      {/* ── Submission Info Cards ──────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-          {/* Topic Name */}
-          <div className="bg-base-200 rounded-2xl p-5">
-
-            <p className="text-sm text-base-content/60 mb-2">
-
-              Topic Name
-
-            </p>
-
-            <h2 className="text-3xl font-bold">
-
-              {topicName}
-
-            </h2>
+        {/* User */}
+        <div className="bg-base-200 border border-base-300 rounded-2xl p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <User size={22} />
           </div>
+          <div>
+            <p className="text-xs text-base-content/50 font-semibold uppercase tracking-wider">Student</p>
+            <p className="text-lg font-bold">{username}</p>
+          </div>
+        </div>
 
-          {/* Username */}
-          <div className="bg-base-200 rounded-2xl p-5">
+        {/* Test Topic */}
+        <div className="bg-base-200 border border-base-300 rounded-2xl p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+            <BookOpen size={22} />
+          </div>
+          <div>
+            <p className="text-xs text-base-content/50 font-semibold uppercase tracking-wider">Topic</p>
+            <p className="text-lg font-bold">{topicName}</p>
+          </div>
+        </div>
 
-            <p className="text-sm text-base-content/60 mb-2">
-
-              Username
-
+        {/* Questions count */}
+        <div className="bg-base-200 border border-base-300 rounded-2xl p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+            <ListChecks size={22} />
+          </div>
+          <div>
+            <p className="text-xs text-base-content/50 font-semibold uppercase tracking-wider">Questions</p>
+            <p className="text-lg font-bold">
+              {isMcq
+                ? `${correctCount} / ${questions.length} Correct`
+                : `${questions.length} Questions`}
             </p>
+          </div>
+        </div>
 
-            <h2 className="text-3xl font-bold">
-
-              {username}
-
-            </h2>
+        {/* Score */}
+        <div className="bg-base-200 border border-base-300 rounded-2xl p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
+            <ClipboardList size={22} />
+          </div>
+          <div>
+            <p className="text-xs text-base-content/50 font-semibold uppercase tracking-wider">Total Score</p>
+            <p className="text-lg font-bold">{totalScore} pts</p>
           </div>
         </div>
       </div>
 
-      {/* Question Evaluations */}
-      <div className="space-y-6">
-
-        {questions.map(
-          (
-            question,
-            index
-          ) => (
-
-            <SubmissionEvaluationCard
-              key={index}
-
-              questionNumber={
-                index + 1
-              }
-
-              questionName={
-                question.questionName
-              }
-
-              codingMarks={
-                question.codingMarks
-              }
-
-              timeComplexityMarks={
-                question.timeComplexityMarks
-              }
-
-              spaceComplexityMarks={
-                question.spaceComplexityMarks
-              }
-
-              remarks={
-                question.remarks
-              }
-
-              isSolved={
-                question.isSolved || false
-              }
-
-              onChange={(
-                field,
-                value
-              ) =>
-                handleChange(
-                  index,
-                  field,
-                  value
-                )
-              }
-
-              onView={() =>
-                handleView(
-                  question
-                )
-              }
-            />
-          )
-        )}
+      {/* ── Section Title ─────────────────────────────────────────────────── */}
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-base-content/80">
+          {isMcq ? "MCQ Questions" : "Coding Questions"}
+        </h2>
+        <p className="text-sm text-base-content/50">
+          {isMcq
+            ? "Click any option circle to override the correct answer if the AI made a mistake."
+            : "Set marks and remarks for each coding question."}
+        </p>
       </div>
 
-      {/* Bottom Actions */}
-      <div className="mt-10 bg-base-100 border border-base-300 rounded-3xl p-6 shadow-md">
+      {/* ── Question Cards ─────────────────────────────────────────────────── */}
+      <div className="space-y-5 mb-8">
+        {questions.map((question, index) => {
+          if (question.questionType === "mcq") {
+            return (
+              <McqSubmissionEvaluationCard
+                key={index}
+                questionNumber={index + 1}
+                questionName={question.questionName}
+                options={question.options}
+                selectedOption={question.selectedOption}
+                correctOption={question.correctOption}
+                mcqMarks={question.mcqMarks}
+                onChange={(value) => handleChange(index, "correctOption", value)}
+              />
+            );
+          }
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-
-          {/* Final Evaluation Checkbox */}
-          <label className="flex items-center gap-4 cursor-pointer">
-
-            <input
-              type="checkbox"
-
-              className="checkbox checkbox-success checkbox-lg"
-
-              checked={evaluated}
-
-              onChange={(e) =>
-                setEvaluated(
-                  e.target.checked
-                )
-              }
+          return (
+            <SubmissionEvaluationCard
+              key={index}
+              questionNumber={index + 1}
+              questionName={question.questionName}
+              codingMarks={question.codingMarks}
+              timeComplexityMarks={question.timeComplexityMarks}
+              spaceComplexityMarks={question.spaceComplexityMarks}
+              remarks={question.remarks}
+              isSolved={question.isSolved || false}
+              onChange={(field, value) => handleChange(index, field, value)}
+              onView={() => handleView(question)}
             />
+          );
+        })}
+      </div>
 
+      {/* ── Bottom Action Bar ─────────────────────────────────────────────── */}
+      <div className="sticky bottom-4 z-40">
+        <div className="bg-base-100/90 backdrop-blur-lg border border-base-300 rounded-3xl p-5 shadow-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+          {/* Evaluated Toggle */}
+          <label className="flex items-center gap-4 cursor-pointer select-none">
+            <div
+              onClick={() => setEvaluated((prev) => !prev)}
+              className={`w-12 h-12 rounded-2xl border-2 flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                evaluated
+                  ? "bg-success border-success text-white"
+                  : "border-base-300 bg-base-200 text-base-content/30"
+              }`}
+            >
+              {evaluated ? <CheckSquare size={22} /> : <Square size={22} />}
+            </div>
             <div>
-
-              <h2 className="text-xl font-bold">
-
-                {
-                  evaluated
-
-                    ? "Submission Evaluated"
-
-                    : "Mark Submission As Evaluated"
-                }
-
-              </h2>
-
-              <p className="text-base-content/60">
-
-                Evaluation status will update only after clicking Update button
-
+              <h3 className="font-bold text-base">
+                {evaluated ? "Marked as Evaluated" : "Mark as Evaluated"}
+              </h3>
+              <p className="text-xs text-base-content/50">
+                Status is saved when you click Update
               </p>
             </div>
           </label>
@@ -816,17 +301,19 @@ const SubmissionEvaluation = () => {
           <button
             onClick={handleUpdateAll}
             disabled={submitting}
-            className="btn btn-primary rounded-2xl h-14 px-10 text-lg"
+            className="btn btn-primary rounded-2xl h-14 px-10 text-base gap-2 min-w-[200px]"
           >
-
-            {
-              submitting
-
-                ? "Updating..."
-
-                : "Update All Evaluations"
-            }
-
+            {submitting ? (
+              <>
+                <RefreshCw size={18} className="animate-spin" />
+                Saving…
+              </>
+            ) : (
+              <>
+                <CheckSquare size={18} />
+                Save All Evaluations
+              </>
+            )}
           </button>
         </div>
       </div>

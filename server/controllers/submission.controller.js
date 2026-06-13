@@ -402,11 +402,13 @@ export const updateSubmissionStatus =
       const { isEvaluated } =
         req.body;
 
+      // Admin can update any submission; regular users only their own
+      const submissionQuery = req.user?.isAdmin
+        ? { _id: submissionId }
+        : { _id: submissionId, user: req.user._id };
+
       const submission =
-        await Submission.findOne({
-          _id: submissionId,
-          user: req.user._id,
-        });
+        await Submission.findOne(submissionQuery);
 
       if (!submission) {
 
@@ -460,6 +462,7 @@ export const evaluateSubmission = async (req, res) => {
       spaceComplexityMarks,
       remarks,
       isSolved,
+      correctOption,
     } = req.body;
 
     const { submissionId, questionIndex } = req.params;
@@ -478,18 +481,35 @@ export const evaluateSubmission = async (req, res) => {
       });
     }
 
-    submission.questions[questionIndex].codingMarks = Number(codingMarks);
-    submission.questions[questionIndex].timeComplexityMarks = Number(
-      timeComplexityMarks
-    );
-    submission.questions[questionIndex].spaceComplexityMarks = Number(
-      spaceComplexityMarks
-    );
-    submission.questions[questionIndex].isSolved = Boolean(isSolved);
-    submission.questions[questionIndex].remarks = remarks;
+    const question = submission.questions[questionIndex];
+
+    if (question.questionType === "mcq") {
+      if (typeof correctOption === "number") {
+        question.correctOption = correctOption;
+        question.isCorrect =
+          question.selectedOption !== null &&
+          question.selectedOption === correctOption;
+
+        const test = await Test.findById(submission.test).select("mcqQuestions");
+        const questionMarks = test?.mcqQuestions?.[questionIndex]?.marks ?? 1;
+
+        question.mcqMarks = question.isCorrect ? questionMarks : 0;
+        question.isSolved = question.isCorrect;
+        question.isEvaluated = true;
+      }
+    } else {
+      question.codingMarks = Number(codingMarks);
+      question.timeComplexityMarks = Number(timeComplexityMarks);
+      question.spaceComplexityMarks = Number(spaceComplexityMarks);
+      question.isSolved = Boolean(isSolved);
+      question.remarks = remarks;
+    }
 
     const allEvaluated = submission.questions.every(
-      (question) => question.remarks && question.remarks.trim() !== ""
+      (q) => {
+        if (q.questionType === "mcq") return q.isEvaluated;
+        return q.remarks && q.remarks.trim() !== "";
+      }
     );
 
     if (allEvaluated) {
@@ -541,6 +561,19 @@ export const getLeaderboardByTest = async (
 
     const { testId } =
       req.params;
+
+    const test = await Test.findById(testId);
+    if (!test) {
+      return res.status(404).json({
+        message: "Test not found",
+      });
+    }
+
+    if (test.sourceType === "ai") {
+      return res.status(403).json({
+        message: "Leaderboard is not available for AI generated tests",
+      });
+    }
 
     const submissions =
       await Submission.find({
@@ -808,17 +841,24 @@ export const finishSubmission =
         });
       }
 
+      const test = await Test.findById(submission.test).select(
+        "mcqQuestions testType"
+      );
+
       submission.isFinished =
         true;
 
-      submission.questions.forEach((question) => {
+      submission.questions.forEach((question, index) => {
         if (question.questionType !== "mcq") return;
 
         question.isCorrect =
           question.selectedOption !== null &&
           question.selectedOption === question.correctOption;
 
-        question.mcqMarks = question.isCorrect ? 1 : 0;
+        const questionMarks =
+          test?.mcqQuestions?.[index]?.marks ?? 1;
+
+        question.mcqMarks = question.isCorrect ? questionMarks : 0;
         question.isSolved = question.isCorrect;
         question.isEvaluated = true;
       });

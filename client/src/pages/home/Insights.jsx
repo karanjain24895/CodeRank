@@ -240,11 +240,15 @@ const Insights = () => {
 
   const topicName = submission.test?.topicName || "Insights";
   const topics =
-    submission.test?.topics ||
-    submission.test?.topicFolderIds ||
-    [];
+    submission.test?.testType === "mcq"
+      ? (submission.test?.subject ? [{ name: submission.test.subject }] : [])
+      : (submission.test?.topics || submission.test?.topicFolderIds || []);
   const insights = submission.questions || [];
   const fullMarks = submission.test?.fullMarks || 0;
+  const mcqMarksPerQuestion =
+    submission.test?.testType === "mcq" && insights.length
+      ? fullMarks / insights.length
+      : 1;
 
   // Total Score
   const score = insights.reduce((total, question) => {
@@ -325,12 +329,14 @@ const Insights = () => {
             )}
           </div>
 
-          <button
-            className="btn btn-primary btn-sm rounded-xl shadow-sm"
-            onClick={handleLeaderboardOpen}
-          >
-            🏆 View Leaderboard
-          </button>
+          {submission.test?.sourceType !== "ai" && (
+            <button
+              className="btn btn-primary btn-sm rounded-xl shadow-sm"
+              onClick={handleLeaderboardOpen}
+            >
+              🏆 View Leaderboard
+            </button>
+          )}
         </div>
 
         {/* Stats */}
@@ -406,7 +412,7 @@ const Insights = () => {
             spaceComplexityMarks={question.spaceComplexityMarks}
             totalMarks={
               question.questionType === "mcq"
-                ? 1
+                ? mcqMarksPerQuestion
                 : (question.codingMarks || 0) +
               (question.timeComplexityMarks || 0) +
               (question.spaceComplexityMarks || 0)

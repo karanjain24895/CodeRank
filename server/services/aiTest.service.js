@@ -4,6 +4,7 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 
 
+
 const MCQ_MARKS = 10;
 const MCQ_BATCH_SIZE = 10;
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";

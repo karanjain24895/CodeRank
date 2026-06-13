@@ -30,6 +30,7 @@ const CodingTest = () => {
   const [mcqAnswers, setMcqAnswers] = useState([]);
   const [savedMcqAnswers, setSavedMcqAnswers] = useState([]);
   const [savingAnswer, setSavingAnswer] = useState(false);
+  const [endTime, setEndTime] = useState(null);
   // const [timerStarted, setTimerStarted] = useState(false);
 
   useEffect(() => {
@@ -121,6 +122,8 @@ const CodingTest = () => {
     submission._id
   );
 
+  setEndTime(submission.endTime);
+
   setShowInstructions(false);
 
   // Restore user's TC/SC
@@ -182,6 +185,7 @@ const startTest = async () => {
     });
 
     setSubmissionId(res.data._id);
+    setEndTime(res.data.endTime);
     const restoredMcqAnswers =
       res.data.questions?.map((q) =>
         typeof q.selectedOption === "number"
@@ -271,51 +275,44 @@ const handleSubmit = async () => {
   }
 };
 
-const handleMcqOptionChange = (optionIndex) => {
+const handleMcqOptionChange = async (optionIndex) => {
+  if (!submissionId) {
+    return alert("Please start the test first");
+  }
+
   setMcqAnswers((prev) => {
     const updated = [...prev];
     updated[selectedQuestion] = optionIndex;
     return updated;
   });
-};
-
-const handleMcqSaveAndNext = async () => {
-  if (!submissionId) {
-    return alert("Please start the test first");
-  }
-
-  const selectedOption = mcqAnswers[selectedQuestion];
-
-  if (typeof selectedOption !== "number") {
-    return alert("Please select an option");
-  }
 
   try {
     setSavingAnswer(true);
-
     await axiosInstance.patch(
       `/submissions/${submissionId}/mcq/${selectedQuestion}`,
-      { selectedOption }
+      { selectedOption: optionIndex }
     );
-
     setSavedMcqAnswers((prev) => {
       const updated = [...prev];
-      updated[selectedQuestion] = selectedOption;
+      updated[selectedQuestion] = optionIndex;
       return updated;
     });
-
-    if (selectedQuestion < test.questions.length - 1) {
-      setSelectedQuestion((prev) => prev + 1);
-    } else {
-      setShowSubmitConfirm(true);
-    }
   } catch (error) {
+    console.error("Failed to save MCQ answer:", error);
     alert(
       error.response?.data?.message ||
         "Failed to save answer"
     );
   } finally {
     setSavingAnswer(false);
+  }
+};
+
+const handleMcqSaveAndNext = () => {
+  if (selectedQuestion < test.questions.length - 1) {
+    setSelectedQuestion((prev) => prev + 1);
+  } else {
+    setShowSubmitConfirm(true);
   }
 };
 
@@ -347,6 +344,8 @@ const handleMcqSaveAndNext = async () => {
     return (
       <McqTestView
         test={test}
+        testId={testId}
+        endTime={endTime}
         selectedQuestion={selectedQuestion}
         mcqAnswers={mcqAnswers}
         savedMcqAnswers={savedMcqAnswers}

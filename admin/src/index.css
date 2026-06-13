@@ -1,2 +1,86 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@theme {
+  --font-sans: "Outfit", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "Fira Code", "Courier New", Courier, monospace;
+}
+
+/* Base resets & Font application */
+html, body {
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Google Material 3 Design Tokens ─── */
+:root, [data-theme="light"] {
+  --primary: #0b57d0; /* Google Primary Blue */
+  --primary-content: #ffffff;
+  --secondary: #00639b;
+  --secondary-content: #ffffff;
+  --accent: #198639; /* Google Green */
+  --accent-content: #ffffff;
+  --neutral: #1f1f1f;
+  --neutral-content: #ffffff;
+  --base-100: #ffffff; /* Clean White */
+  --base-200: #f0f4f9; /* Google Light Slate Container */
+  --base-300: #e3e8ef;
+  --base-content: #1f1f1f;
+  --info: #0b57d0;
+  --success: #198639;
+  --warning: #b06000;
+  --error: #b3261e; /* Google M3 Error Red */
+
+  --rounded-box: 1.25rem; /* Google M3 Card Corner Radius (20px) */
+  --rounded-btn: 9999px;  /* Pill shape buttons for M3 */
+  --rounded-badge: 0.5rem;
+}
+
+[data-theme="dark"] {
+  --primary: #a8c7fa; /* Google M3 Blue Light */
+  --primary-content: #042f66;
+  --secondary: #7fcfff;
+  --secondary-content: #003355;
+  --accent: #81c995; /* Google M3 Green Light */
+  --accent-content: #073b18;
+  --neutral: #303134;
+  --neutral-content: #e8eaed;
+  --base-100: #0f0f10; /* Google dark background */
+  --base-200: #1e1f20; /* Google dark gray container */
+  --base-300: #2d2f31;
+  --base-content: #e3e3e3;
+  --info: #a8c7fa;
+  --success: #81c995;
+  --warning: #fde293;
+  --error: #f28b82;
+
+  --rounded-box: 1.25rem; /* Google M3 Card Corner Radius (20px) */
+  --rounded-btn: 9999px;  /* Pill shape buttons for M3 */
+  --rounded-badge: 0.5rem;
+}
+
+/* Additional Google M3 Styles */
+.btn {
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  text-transform: none; /* Material 3 doesn't use uppercase buttons */
+  box-shadow: none;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.btn-primary {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 8px rgba(11, 87, 208, 0.25), 0 2px 4px rgba(11, 87, 208, 0.15);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  box-shadow: 0 4px 8px rgba(168, 199, 250, 0.25);
+}
+
+.card {
+  border-radius: var(--rounded-box);
+  border: 1px solid var(--base-300);
+}
