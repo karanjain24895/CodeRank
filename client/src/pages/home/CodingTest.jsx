@@ -86,14 +86,14 @@ const CodingTest = () => {
       setTest(testRes.data);
 
       setComplexityAnswers(
-        testRes.data.questions.map(() => ({
+        (testRes.data.questions || []).map(() => ({
           timeComplexity: "",
           spaceComplexity: "",
         }))
       );
 
       setQuestionResults(
-  testRes.data.questions.map(() => ({
+  (testRes.data.questions || []).map(() => ({
     isEvaluated: false,
     codingMarks: 0,
     timeComplexityMarks: 0,
@@ -102,7 +102,7 @@ const CodingTest = () => {
   }))
 );
 
-      const emptyMcqAnswers = testRes.data.questions.map(() => null);
+      const emptyMcqAnswers = (testRes.data.questions || []).map(() => null);
       setMcqAnswers(emptyMcqAnswers);
       setSavedMcqAnswers(emptyMcqAnswers);
 
@@ -309,7 +309,7 @@ const handleMcqOptionChange = async (optionIndex) => {
 };
 
 const handleMcqSaveAndNext = () => {
-  if (selectedQuestion < test.questions.length - 1) {
+  if (selectedQuestion < (test.questions?.length ?? 0) - 1) {
     setSelectedQuestion((prev) => prev + 1);
   } else {
     setShowSubmitConfirm(true);

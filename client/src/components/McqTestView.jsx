@@ -40,8 +40,8 @@ const McqTestView = ({
   testId,              // used as localStorage key
   endTime,             // synchronized endTime from backend
 }) => {
-  const currentQuestion = test.questions[selectedQuestion];
-  const totalQ = test.questions.length;
+  const currentQuestion = (test.questions || [])[selectedQuestion];
+  const totalQ = (test.questions || []).length;
   const answeredCount = savedMcqAnswers.filter(
     (a) => typeof a === "number"
   ).length;
@@ -323,7 +323,7 @@ const McqTestView = ({
             {/* Question grid palette */}
             <div className="flex-1 overflow-y-auto p-3">
               <div className="grid grid-cols-4 gap-2">
-                {test.questions.map((_, index) => (
+                {(test.questions || []).map((_, index) => (
                   <button
                     key={index}
                     onClick={() => onSelectQuestion(index)}

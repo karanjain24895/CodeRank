@@ -61,10 +61,10 @@ const NewTests = () => {
           filterMode,
         },
       });
-      const { tests: rawTests, totalPages: tp, totalCount: tc } = res.data;
-      setTests(rawTests);
-      setTotalPages(tp);
-      setTotalCount(tc);
+      const { tests: rawTests, totalPages: tp, totalCount: tc } = res.data || {};
+      setTests(rawTests || []);
+      setTotalPages(tp || 1);
+      setTotalCount(tc || 0);
     } catch (error) {
       console.error(error);
     } finally {

@@ -27,6 +27,7 @@ const normalizeTestQuestions = (test) => {
     }
 
     if (!plainTest.questionRefs?.length) {
+        plainTest.questions = plainTest.questions || [];
         return plainTest;
     }
 
