@@ -33,6 +33,17 @@ router.post(
 );
 
 // =========================
+// Upload Interview Result (Admin)
+// IMPORTANT: Must be before POST /:testId to avoid wildcard shadowing
+// =========================
+router.post(
+  "/upload-interview",
+  protectRoute,
+  adminRoute,
+  uploadInterviewResult
+);
+
+// =========================
 // Submit Test (SAFEGUARD ADDED)
 // =========================
 router.post(
@@ -79,16 +90,6 @@ router.get(
   protectRoute,
   adminRoute,
   getAllSubmissions
-);
-
-// =========================
-// Upload Interview Result (Admin)
-// =========================
-router.post(
-  "/upload-interview",
-  protectRoute,
-  adminRoute,
-  uploadInterviewResult
 );
 
 // =========================
