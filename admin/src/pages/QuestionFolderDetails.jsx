@@ -11,10 +11,12 @@ import {
 
 import axiosInstance from "../lib/axios";
 import StoredQuestionsCard from "../components/StoredQuestionsCard";
+import useConfirmStore from "../store/useConfirmStore";
 
 const QuestionFolderDetails = () => {
   const { folderId } =
     useParams();
+  const showConfirm = useConfirmStore((state) => state.showConfirm);
 
   const [questions,
     setQuestions] =
@@ -126,13 +128,8 @@ const saveQuestion =
   };
   const deleteQuestion =
     async (id) => {
-      const confirmDelete =
-        window.confirm(
-          "Delete this question?"
-        );
-
-      if (!confirmDelete)
-        return;
+      const confirmed = await showConfirm("Delete this question?");
+      if (!confirmed) return;
 
       try {
         await axiosInstance.delete(
@@ -302,6 +299,8 @@ const saveQuestion =
                       "",
                     marks: "",
                   });
+
+                  setEditingQuestion(null);
                 }}
               >
                 Cancel

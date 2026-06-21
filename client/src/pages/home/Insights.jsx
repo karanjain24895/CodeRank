@@ -329,7 +329,7 @@ const Insights = () => {
             )}
           </div>
 
-          {submission.test?.sourceType !== "ai" && (
+          {submission.test?.sourceType !== "ai" && submission.test?.sourceType !== "interview" && (
             <button
               className="btn btn-primary btn-sm rounded-xl shadow-sm"
               onClick={handleLeaderboardOpen}
@@ -413,6 +413,8 @@ const Insights = () => {
             totalMarks={
               question.questionType === "mcq"
                 ? mcqMarksPerQuestion
+                : question.questionType === "interview"
+                ? (question.maxMarks || 0)
                 : (question.codingMarks || 0) +
               (question.timeComplexityMarks || 0) +
               (question.spaceComplexityMarks || 0)

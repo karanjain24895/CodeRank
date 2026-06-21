@@ -14,6 +14,7 @@ import {
   finishSubmission,
   getSubmissionByTest,
   saveMcqAnswer,
+  uploadInterviewResult,
 } from "../controllers/submission.controller.js";
 
 import protectRoute from "../middleware/protectRoute.js";
@@ -78,6 +79,16 @@ router.get(
   protectRoute,
   adminRoute,
   getAllSubmissions
+);
+
+// =========================
+// Upload Interview Result (Admin)
+// =========================
+router.post(
+  "/upload-interview",
+  protectRoute,
+  adminRoute,
+  uploadInterviewResult
 );
 
 // =========================

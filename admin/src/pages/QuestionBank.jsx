@@ -12,9 +12,11 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import axiosInstance from "../lib/axios";
+import useConfirmStore from "../store/useConfirmStore";
 
 const QuestionBank = () => {
   const navigate = useNavigate();
+  const showConfirm = useConfirmStore((state) => state.showConfirm);
 
   const [folders, setFolders] =
     useState([]);
@@ -79,12 +81,10 @@ const QuestionBank = () => {
   ) => {
     e.stopPropagation();
 
-    const confirmDelete =
-      window.confirm(
-        "Delete this folder and all questions inside it?"
-      );
-
-    if (!confirmDelete) return;
+    const confirmed = await showConfirm(
+      "Delete this folder and all questions inside it?"
+    );
+    if (!confirmed) return;
 
     try {
       await axiosInstance.delete(

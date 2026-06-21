@@ -68,7 +68,7 @@ const submissionSchema = new mongoose.Schema(
       {
         questionType: {
           type: String,
-          enum: ["coding", "mcq"],
+          enum: ["coding", "mcq", "interview"],
           default: "coding",
         },
 
@@ -104,6 +104,12 @@ const submissionSchema = new mongoose.Schema(
         },
 
         mcqMarks: {
+          type: Number,
+          default: 0,
+          min: 0,
+        },
+
+        maxMarks: {
           type: Number,
           default: 0,
           min: 0,

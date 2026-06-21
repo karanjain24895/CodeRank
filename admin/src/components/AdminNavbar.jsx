@@ -56,6 +56,12 @@ const AdminNavbar = () => {
           icon: FileCode,
           end: true,
         },
+        {
+          name: "Upload Result",
+          path: "/submissions/upload-result",
+          icon: PlusCircle,
+          end: true,
+        },
       ],
     },
     {

@@ -165,12 +165,7 @@ const McqTestView = ({
       ? "text-warning"               // < 5 min — amber
       : "text-success";              // plenty of time — green
 
-  /* ── Submit confirm message ────────────────────────── */
-  const submitMessage =
-    `You have answered ${answeredCount} out of ${totalQ} question${totalQ !== 1 ? "s" : ""}.\n` +
-    (answeredCount < totalQ
-      ? `${totalQ - answeredCount} question${totalQ - answeredCount !== 1 ? "s" : ""} are still unanswered. Are you sure you want to submit?`
-      : "All questions answered! Are you sure you want to submit?");
+
 
   /* ── Render ─────────────────────────────────────────── */
   return (

@@ -78,6 +78,77 @@ const InsightsCard = ({
         );
     }
 
+    if (questionType === "interview") {
+        return (
+            <div className="w-full bg-base-100 border border-base-300 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                {/* Top Row */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    {/* Left Side */}
+                    <div className="flex items-center gap-3">
+                        {/* Question Number */}
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                            {questionNumber}
+                        </div>
+                        {/* Question Name */}
+                        <div>
+                            <h2 className="text-lg sm:text-xl font-bold text-base-content">
+                                {questionName}
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Middle Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    {/* Obtained Marks */}
+                    <div className="bg-base-200 border border-base-300 rounded-xl p-3 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                            <Trophy size={18} />
+                        </div>
+                        <div>
+                            <p className="text-xs text-base-content/60">
+                                Obtained Marks
+                            </p>
+                            <h3 className="font-bold text-base">
+                                {codingMarks}
+                            </h3>
+                        </div>
+                    </div>
+
+                    {/* Total Marks */}
+                    <div className="bg-base-200 border border-base-300 rounded-xl p-3 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-success">
+                            <Trophy size={18} />
+                        </div>
+                        <div>
+                            <p className="text-xs text-base-content/60">
+                                Total Marks
+                            </p>
+                            <h3 className="font-bold text-base">
+                                {totalMarks}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom Row */}
+                <div className="bg-base-200 border border-base-300 rounded-xl p-4 flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center text-warning shrink-0">
+                        <MessageSquareText size={18} />
+                    </div>
+                    <div>
+                        <p className="text-xs text-base-content/60 mb-1">
+                            Remarks
+                        </p>
+                        <h3 className="font-medium text-sm text-base-content leading-relaxed">
+                            {remarks?.trim() ? remarks : "N/A"}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full bg-base-100 border border-base-300 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
 

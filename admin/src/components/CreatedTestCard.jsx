@@ -2,12 +2,14 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash2, Tags, Hash } from "lucide-react";
 import axiosInstance from "../lib/axios";
+import useConfirmStore from "../store/useConfirmStore";
 
 const CreatedTestCard = ({ testId, testNumber, topicName, topics = [] }) => {
   const navigate = useNavigate();
+  const showConfirm = useConfirmStore((state) => state.showConfirm);
 
   const handleDelete = async () => {
-    const confirmed = window.confirm(
+    const confirmed = await showConfirm(
       "Are you sure you want to delete this test? This will also delete all related submissions."
     );
     if (!confirmed) return;

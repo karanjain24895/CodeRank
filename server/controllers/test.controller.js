@@ -26,6 +26,12 @@ const normalizeTestQuestions = (test) => {
         return plainTest;
     }
 
+    if (plainTest.testType === "interview") {
+        plainTest.questions = plainTest.questions || [];
+        plainTest.topics = plainTest.topics || [];
+        return plainTest;
+    }
+
     if (!plainTest.questionRefs?.length) {
         plainTest.questions = plainTest.questions || [];
         return plainTest;

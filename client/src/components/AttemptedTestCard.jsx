@@ -71,6 +71,10 @@ const AttemptedTestCard = ({
               <span className="badge badge-primary gap-1 font-semibold text-[10px] sm:text-xs py-2 px-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-none shadow-sm select-none">
                 <Sparkles size={11} className="shrink-0 text-violet-200" /> AI
               </span>
+            ) : sourceType === "interview" ? (
+              <span className="badge badge-accent gap-1 font-semibold text-[10px] sm:text-xs py-2 px-2.5 bg-accent/15 text-accent border border-accent/20 shadow-sm select-none">
+                <Sparkles size={11} className="shrink-0 text-accent" /> Interview
+              </span>
             ) : (
               <span className="badge badge-neutral gap-1 font-semibold text-[10px] sm:text-xs py-2 px-2.5 bg-base-200 text-base-content/80 border-none shadow-sm select-none">
                 <User size={11} className="shrink-0 text-base-content/50" /> Admin

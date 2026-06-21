@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import AdminNavbar from "./components/AdminNavbar";
+import ConfirmModal from "./components/ConfirmModal";
 
 import TestForm from "./pages/TestForm";
 import Submissions from "./pages/Submissions";
@@ -16,6 +17,7 @@ import SubmissionEvaluation from "./pages/SubmissionEvaluation";
 import CreatedTests from "./pages/CreatedTests";
 import QuestionBank from "./pages/QuestionBank"
 import QuestionFolderDetails from "./pages/QuestionFolderDetails";
+import UploadInterviewResult from "./pages/UploadInterviewResult";
 // import AddQuestions from "./pages/AddQuestions";
 
 // Layout Wrapper
@@ -34,6 +36,9 @@ const Layout = () => {
         <Outlet />
 
       </main>
+
+      {/* Custom Confirm Modal */}
+      <ConfirmModal />
 
     </div>
   );
@@ -110,6 +115,10 @@ function App() {
             element={
               <SubmissionEvaluation />
             }
+          />
+          <Route
+            path="/submissions/upload-result"
+            element={<UploadInterviewResult />}
           />
           <Route
             path="/question-bank"

@@ -982,3 +982,76 @@ export const saveMcqAnswer = async (req, res) => {
     });
   }
 };
+
+export const uploadInterviewResult = async (req, res) => {
+  try {
+    const { userId, testName, topics, questions } = req.body;
+
+    if (!userId || !testName || !questions || !questions.length) {
+      return res.status(400).json({
+        message: "Missing required fields: userId, testName, and questions are required.",
+      });
+    }
+
+    // Calculate full marks
+    const fullMarks = questions.reduce((sum, q) => sum + Number(q.totalMarks || 0), 0);
+
+    // Create the Test document
+    const test = await Test.create({
+      topicName: testName,
+      testName,
+      testType: "interview",
+      sourceType: "interview",
+      duration: 0,
+      startDateTime: new Date(),
+      fullMarks,
+      generatedFor: userId,
+      topics: topics.map((t) => ({ name: t })),
+      questions: questions.map((q, idx) => ({
+        questionNumber: idx + 1,
+        questionName: q.questionName,
+        marks: Number(q.totalMarks || 0),
+        description: q.remarks || "",
+      })),
+      createdBy: req.user._id,
+    });
+
+    // Create the Submission document pre-evaluated
+    const submissionQuestions = questions.map((q, idx) => ({
+      questionType: "interview",
+      questionName: q.questionName,
+      codingMarks: Number(q.obtainedMarks || 0),
+      timeComplexityMarks: 0,
+      spaceComplexityMarks: 0,
+      maxMarks: Number(q.totalMarks || 0),
+      isSolved: Number(q.obtainedMarks || 0) > 0,
+      isEvaluated: true,
+      remarks: q.remarks || "",
+    }));
+
+    const submission = await Submission.create({
+      user: userId,
+      test: test._id,
+      status: "evaluated",
+      isEvaluated: true,
+      isFinished: true,
+      submittedAt: new Date(),
+      evaluatedAt: new Date(),
+      startTime: new Date(),
+      endTime: new Date(),
+      duration: 0,
+      questions: submissionQuestions,
+    });
+
+    res.status(201).json({
+      message: "Interview result uploaded successfully",
+      test,
+      submission,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to upload interview result",
+      error: error.message,
+    });
+  }
+};

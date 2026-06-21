@@ -14,15 +14,24 @@ const testSchema = new mongoose.Schema(
 
     sourceType: {
       type: String,
-      enum: ["manual", "ai"],
+      enum: ["manual", "ai", "interview"],
       default: "manual",
     },
 
     testType: {
       type: String,
-      enum: ["coding", "mcq"],
+      enum: ["coding", "mcq", "interview"],
       default: "coding",
     },
+
+    topics: [
+      {
+        name: {
+          type: String,
+          trim: true,
+        },
+      },
+    ],
 
     subject: {
       type: String,
