@@ -997,7 +997,8 @@ export const uploadInterviewResult = async (req, res) => {
     const fullMarks = questions.reduce((sum, q) => sum + Number(q.totalMarks || 0), 0);
 
     // Create the Test document
-    const test = await Test.create({
+    // Note: createdBy is optional — admin key bypass sets req.user = { isAdmin: true } (no _id)
+    const testData = {
       topicName: testName,
       testName,
       testType: "interview",
@@ -1013,8 +1014,12 @@ export const uploadInterviewResult = async (req, res) => {
         marks: Number(q.totalMarks || 0),
         description: q.remarks || "",
       })),
-      createdBy: req.user._id,
-    });
+    };
+    if (req.user?._id) {
+      testData.createdBy = req.user._id;
+    }
+
+    const test = await Test.create(testData);
 
     // Create the Submission document pre-evaluated
     const submissionQuestions = questions.map((q, idx) => ({

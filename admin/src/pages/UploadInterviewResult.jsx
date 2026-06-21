@@ -287,13 +287,6 @@ const UploadInterviewResult = () => {
               <BookOpen size={18} className="text-primary" />
               Question & Grade Breakdown
             </h2>
-            <button
-              type="button"
-              onClick={handleAddQuestionRow}
-              className="btn btn-outline btn-primary rounded-xl h-9 min-h-0 px-3 text-xs font-semibold"
-            >
-              <Plus size={14} className="mr-1" /> Add Question Row
-            </button>
           </div>
 
           <div className="space-y-4">
@@ -371,6 +364,16 @@ const UploadInterviewResult = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="flex justify-center pt-2">
+            <button
+              type="button"
+              onClick={handleAddQuestionRow}
+              className="btn btn-outline btn-primary rounded-xl h-11 min-h-0 px-6 text-sm font-semibold flex items-center gap-2"
+            >
+              <Plus size={16} /> Add Question Row
+            </button>
           </div>
         </div>
 
