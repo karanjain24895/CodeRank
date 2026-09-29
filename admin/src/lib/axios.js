@@ -6,6 +6,10 @@ const axiosInstance = axios.create({
 
   withCredentials: true,
 
+  headers: {
+    "x-admin-key": import.meta.env.VITE_ADMIN_KEY,
+  },
+
 });
 
 export default axiosInstance;

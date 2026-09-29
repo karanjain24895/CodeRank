@@ -330,7 +330,7 @@ const UploadInterviewResult = () => {
                   <div className="md:col-span-3 space-y-1.5">
                     <label className="text-xs font-medium text-base-content/65 block">Total Marks</label>
                     <input
-                      type="number"
+                      type="text"
                       placeholder="e.g. 10"
                       value={q.totalMarks}
                       onChange={(e) => handleQuestionChange(idx, "totalMarks", e.target.value)}
@@ -342,7 +342,7 @@ const UploadInterviewResult = () => {
                   <div className="md:col-span-3 space-y-1.5">
                     <label className="text-xs font-medium text-base-content/65 block">Obtained Marks</label>
                     <input
-                      type="number"
+                      type="text"
                       placeholder="e.g. 8"
                       value={q.obtainedMarks}
                       onChange={(e) => handleQuestionChange(idx, "obtainedMarks", e.target.value)}
